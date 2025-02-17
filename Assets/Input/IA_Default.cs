@@ -53,6 +53,15 @@ public partial class @IA_Default: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""UseItem"",
+                    ""type"": ""Button"",
+                    ""id"": ""2aee2588-4015-4806-9e43-cd39ad970ff2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -257,11 +266,33 @@ public partial class @IA_Default: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""ccba16c5-3eb6-4f62-8e3e-4d4065e864ac"",
-                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Drift"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""54df6ada-af8c-4d78-9135-c110c39e1073"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UseItem"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""865ee9ce-9cc2-4b8a-91b5-c7490d3397f5"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UseItem"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -275,6 +306,7 @@ public partial class @IA_Default: IInputActionCollection2, IDisposable
         m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
         m_Player_Brake = m_Player.FindAction("Brake", throwIfNotFound: true);
         m_Player_Drift = m_Player.FindAction("Drift", throwIfNotFound: true);
+        m_Player_UseItem = m_Player.FindAction("UseItem", throwIfNotFound: true);
     }
 
     ~@IA_Default()
@@ -344,6 +376,7 @@ public partial class @IA_Default: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Movement;
     private readonly InputAction m_Player_Brake;
     private readonly InputAction m_Player_Drift;
+    private readonly InputAction m_Player_UseItem;
     public struct PlayerActions
     {
         private @IA_Default m_Wrapper;
@@ -351,6 +384,7 @@ public partial class @IA_Default: IInputActionCollection2, IDisposable
         public InputAction @Movement => m_Wrapper.m_Player_Movement;
         public InputAction @Brake => m_Wrapper.m_Player_Brake;
         public InputAction @Drift => m_Wrapper.m_Player_Drift;
+        public InputAction @UseItem => m_Wrapper.m_Player_UseItem;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -369,6 +403,9 @@ public partial class @IA_Default: IInputActionCollection2, IDisposable
             @Drift.started += instance.OnDrift;
             @Drift.performed += instance.OnDrift;
             @Drift.canceled += instance.OnDrift;
+            @UseItem.started += instance.OnUseItem;
+            @UseItem.performed += instance.OnUseItem;
+            @UseItem.canceled += instance.OnUseItem;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -382,6 +419,9 @@ public partial class @IA_Default: IInputActionCollection2, IDisposable
             @Drift.started -= instance.OnDrift;
             @Drift.performed -= instance.OnDrift;
             @Drift.canceled -= instance.OnDrift;
+            @UseItem.started -= instance.OnUseItem;
+            @UseItem.performed -= instance.OnUseItem;
+            @UseItem.canceled -= instance.OnUseItem;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -404,5 +444,6 @@ public partial class @IA_Default: IInputActionCollection2, IDisposable
         void OnMovement(InputAction.CallbackContext context);
         void OnBrake(InputAction.CallbackContext context);
         void OnDrift(InputAction.CallbackContext context);
+        void OnUseItem(InputAction.CallbackContext context);
     }
 }
