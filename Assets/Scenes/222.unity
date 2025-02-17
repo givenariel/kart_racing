@@ -312,7 +312,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 190455828}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdc4a1cf983831649a3a4127764c4d7f, type: 3}
+  m_Script: {fileID: 11500000, guid: 18e251bf0ab2d0a4dac5df95988d8958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   boost: 200
@@ -1156,11 +1156,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1251518472}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1a90863f9f8fcb4e9602befa53d657e, type: 3}
+  m_Script: {fileID: 11500000, guid: b50c9a96981d78b4b97a8bc3d226ab79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  availableItems: 010000000200000000000000
-  respawnTime: 10
+  availableItems: 0100000002000000
+  respawnTime: 3
 --- !u!1 &1259868717
 GameObject:
   m_ObjectHideFlags: 0
@@ -1295,7 +1295,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: lap 1 / 3
+  m_text: lap  / 3
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1492,7 +1492,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1447728193}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1a90863f9f8fcb4e9602befa53d657e, type: 3}
+  m_Script: {fileID: 11500000, guid: b50c9a96981d78b4b97a8bc3d226ab79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   availableItems: 0100000002000000
@@ -1668,11 +1668,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1573416111}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1a90863f9f8fcb4e9602befa53d657e, type: 3}
+  m_Script: {fileID: 11500000, guid: b50c9a96981d78b4b97a8bc3d226ab79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   availableItems: 0100000002000000
-  respawnTime: 10
+  respawnTime: 3
 --- !u!1 &1614286971
 GameObject:
   m_ObjectHideFlags: 0
@@ -1791,11 +1791,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1614286971}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1a90863f9f8fcb4e9602befa53d657e, type: 3}
+  m_Script: {fileID: 11500000, guid: b50c9a96981d78b4b97a8bc3d226ab79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   availableItems: 0100000002000000
-  respawnTime: 10
+  respawnTime: 3
 --- !u!1001 &1644213882
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2017,11 +2017,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1778636539}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1a90863f9f8fcb4e9602befa53d657e, type: 3}
+  m_Script: {fileID: 11500000, guid: b50c9a96981d78b4b97a8bc3d226ab79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  availableItems: 01000000020000000200000002000000
-  respawnTime: 10
+  availableItems: 0100000002000000
+  respawnTime: 3
 --- !u!1 &1789094661 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3774706472542914721, guid: c785244293df166438eb1d4a30a0c2fa, type: 3}
@@ -2060,7 +2060,7 @@ GameObject:
   - component: {fileID: 1910846064}
   m_Layer: 0
   m_Name: LAP
-  m_TagString: Untagged
+  m_TagString: StartLine
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3504,8 +3504,8 @@ GameObject:
   - component: {fileID: 2536015327339062950}
   - component: {fileID: 9108316449566354631}
   - component: {fileID: 1144367328871505289}
+  - component: {fileID: 9108316449566354635}
   - component: {fileID: 2961982442195354918}
-  - component: {fileID: 9108316449566354632}
   - component: {fileID: 9108316449566354633}
   - component: {fileID: 9108316449566354634}
   m_Layer: 6
@@ -5021,24 +5021,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.8065076, y: 1.9266777, z: 4.865568}
   m_Center: {x: 0.052953422, y: 0.46333885, z: 0.13238287}
---- !u!114 &9108316449566354632
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4220489492396815659}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97b10c5615f556a41889ba9c89eb6321, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sphereRB: {fileID: 6808384903529717708}
-  rodaDepanKiri: {fileID: 3950370440801838850}
-  rodaDepanKanan: {fileID: 2611165335764021496}
-  kecepatan: 5
-  kecepatanBelok: 10
-  maxSteerAngle: 20
 --- !u!114 &9108316449566354633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5048,7 +5030,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4220489492396815659}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd62c846a8cfe7144ae455df36fbffba, type: 3}
+  m_Script: {fileID: 11500000, guid: 297c5e275ede0624fa6158cbd27aefc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   itemImages:
@@ -5063,7 +5045,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 4220489492396815659}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 388d6f3352087184b8cf5d4ac66fb03b, type: 3}
+  m_Script: {fileID: 11500000, guid: 7e7ce4545000de24683a37ccef367b7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sphereRB: {fileID: 6808384903529717708}
+  rodaDepanKiri: {fileID: 3950370440801838850}
+  rodaDepanKanan: {fileID: 2611165335764021496}
+  kecepatan: 10
+  kecepatanBelok: 5
+  maxSteerAngle: 30
+--- !u!114 &9108316449566354635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4220489492396815659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ba17bfa03d0ee4469b0f83557fb2708, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   totalLaps: 3
