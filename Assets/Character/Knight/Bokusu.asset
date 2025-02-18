@@ -15,5 +15,5 @@ MonoBehaviour:
   id: 1
   displayName: Ninja
   icon: {fileID: 21300000, guid: f989672c6591a6a4090d90a747ebbba5, type: 3}
-  introPrefabs: {fileID: 7596606959196900967, guid: d8745146d74f55f41bf76d52aaba4e9a, type: 3}
-  gameplayPrefab: {fileID: 7973457597125111140, guid: d8745146d74f55f41bf76d52aaba4e9a, type: 3}
+  introPrefabs: {fileID: 8018642908230268857, guid: 78363f08d50c70049824bfca0996b5de, type: 3}
+  gameplayPrefab: {fileID: 5195024321515113232, guid: 78363f08d50c70049824bfca0996b5de, type: 3}

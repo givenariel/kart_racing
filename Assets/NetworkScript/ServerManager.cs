@@ -236,8 +236,16 @@ public class ServerManager : MonoBehaviour
     public void StartGame()
     {
         gameHasStarted = true;
+
+        // Debugging: Check if ClientData exists and has the right character IDs
+        foreach (var client in ClientData)
+        {
+            Debug.Log($"[StartGame] ClientID: {client.Key}, CharacterID: {client.Value.characterId}");
+        }
+        
         NetworkManager.Singleton.SceneManager.LoadScene(gameplaySceneName, LoadSceneMode.Single);
-        Destroy(gameObject);
+
+        //Destroy(gameObject);
     }
 
     public void CheckNetworkStatus()
