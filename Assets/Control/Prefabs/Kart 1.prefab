@@ -114,8 +114,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 898078496893008832}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.19860452, y: 0.6996421, z: -0.21296689, w: 0.6524586}
-  m_LocalPosition: {x: 0.3632331, y: 1.6700001, z: 285.0692}
+  m_LocalRotation: {x: 0.291202, y: 0, z: 0, w: 0.9566616}
+  m_LocalPosition: {x: 0, y: 3.65, z: -5.44}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -884,7 +884,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3756297135458205235, guid: 4a55466c3ebe2074bb15e6cca340bc34, type: 3}
+  - {fileID: 2100000, guid: b3496316a642d1a40ac6b1f473159ed8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1056,7 +1056,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b3496316a642d1a40ac6b1f473159ed8, type: 2}
+  - {fileID: 2100000, guid: 157a56e580f3ac341b97b6e4e5da80b4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1595,7 +1595,7 @@ GameObject:
   - component: {fileID: 3266045035000087608}
   - component: {fileID: 2068606222703793008}
   m_Layer: 7
-  m_Name: Kart
+  m_Name: Kart 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1680,7 +1680,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2887266011
+  GlobalObjectIdHash: 628172366
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1

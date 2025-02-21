@@ -12,9 +12,11 @@ public class kartController : NetworkBehaviour // Inherit from NetworkBehaviour 
     private Vector2 inputValue;
     private Vector3 origin;
     private Vector3 carVelocity;
-    private float moveInput, turnInput, brakeInput, driftInput;
+    private float moveInput, turnInput, brakeInput, driftInput, useItemInput;
     private float TurnMultiplyer, sign, radius;
     IA_Default inputActions;
+    public float boost = 100f;
+    private PlayerInventory playerInventory;
 
     // NGO integration: When the networked object spawns, disable input processing on non-owned instances.
     public override void OnNetworkSpawn()
@@ -35,6 +37,9 @@ public class kartController : NetworkBehaviour // Inherit from NetworkBehaviour 
         inputActions.Player.Movement.Enable();
         inputActions.Player.Brake.Enable();
         inputActions.Player.Drift.Enable();
+        inputActions.Player.UseItem.Enable();
+
+        playerInventory = GetComponent<PlayerInventory>();
     }
 
     private void Update()
@@ -73,11 +78,17 @@ public class kartController : NetworkBehaviour // Inherit from NetworkBehaviour 
         inputValue = inputActions.Player.Movement.ReadValue<Vector2>();
         brakeInput = inputActions.Player.Brake.ReadValue<float>();
         driftInput = inputActions.Player.Drift.ReadValue<float>();
+        useItemInput = inputActions.Player.UseItem.ReadValue<float>();
         moveInput = inputValue.y;
         turnInput = inputValue.x;
 
         sign = Mathf.Sign(carVelocity.z);
         TurnMultiplyer = turnCurve.Evaluate(carVelocity.magnitude / maxSpeed);
+
+        if (useItemInput > 0.1f) // Jika tombol ditekan
+        {
+            UseItem();
+        }
 
         // Debug.Log("Move Input = " + moveInput + 
         // " Turn Input = " + turnInput + 
@@ -109,14 +120,6 @@ public class kartController : NetworkBehaviour // Inherit from NetworkBehaviour 
             carRB.AddTorque(Vector3.up * turnInput * sign * turn * 100 * TurnMultiplyer);
         }
 
-        // if(Braking())
-        // {
-        //     sphereRB.constraints = RigidbodyConstraints.FreezeRotationX;
-        // }
-        // else
-        // {
-        //     sphereRB.constraints = RigidbodyConstraints.None;
-        // }
     }
 
     private bool Drifting()
@@ -131,15 +134,31 @@ public class kartController : NetworkBehaviour // Inherit from NetworkBehaviour 
         }
     }
 
-    // private bool Braking(){
-    //     if (brakeInput > 0.1f){ 
-    //         return true; 
-    //     }
-    //     else
-    //     {
-    //         return false;
-    //     }
-    // }
+
+    public void BoostPowerSlide(float force, Vector3 direction)
+    {
+        direction = new Vector3(direction.x, 0, direction.z).normalized; // Pastikan tetap di sumbu horizontal
+        sphereRB.linearVelocity = direction * force;
+    }
+
+    public void AddImpulseBoost()
+    {
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.AddForce(transform.forward * boost, ForceMode.Impulse);
+            Debug.Log("Boost diaktifkan! Dorongan: " + boost);
+        }
+    }
+
+    void UseItem()
+    {
+        if (playerInventory != null)
+        {
+            playerInventory.UseItem(); // Gunakan item dari Inventory
+        }
+    }
+
 
     private bool Grounded()
     {
@@ -162,5 +181,7 @@ public class kartController : NetworkBehaviour // Inherit from NetworkBehaviour 
     {
         transform.position = newPosition;
     }*/
+
+
 
 }

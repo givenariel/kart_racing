@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Control/Scenes/DummyTrack.unity
     guid: 3efa5062e2471f8428c76f4bfef944c3
+  - enabled: 1
+    path: Assets/Control/Scenes/222.unity
+    guid: a75f1a76b53f5cf4c82dcdadc747f6b8
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
