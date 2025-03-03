@@ -635,7 +635,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0.67769456, z: -0, w: -0.7353435}
   m_LocalPosition: {x: 0.006883621, y: 3, z: 285.83072}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 198286505826923705}
   - {fileID: 9100672464047043718}
@@ -798,8 +798,8 @@ MonoBehaviour:
   sphereRB: {fileID: 236029512762149053}
   rodaDepanKiri: {fileID: 3205891783985159818}
   rodaDepanKanan: {fileID: 149264597201869071}
-  kecepatan: 10
-  kecepatanBelok: 5
+  kecepatan: 20
+  kecepatanBelok: 15
   maxSteerAngle: 30
 --- !u!114 &1374189676100047746
 MonoBehaviour:
@@ -1824,8 +1824,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8457735844288844120}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2733,8 +2733,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6111430691741432586}
   - {fileID: 1696986512440639471}
