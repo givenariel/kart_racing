@@ -3,17 +3,20 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - SlideZone
+  - ItemBox
+  - StartLine
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
-  - kart
-  - sphere
-  - groundLayer
+  - Sphere
+  - Kart
+  - 
   - 
   - 
   - 
