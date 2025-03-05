@@ -1331,12 +1331,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2138902124}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e363abeafaa2cb742b4f3908784a49ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   roomCodeText: {fileID: 1074972849}
+  sceneDropdown: {fileID: 0}
 --- !u!114 &2138902130
 MonoBehaviour:
   m_ObjectHideFlags: 0
