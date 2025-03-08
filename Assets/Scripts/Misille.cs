@@ -1,9 +1,10 @@
 using UnityEngine;
 
-public class Misille : MonoBehaviour
+public class Missile : MonoBehaviour
 {
     public float speed = 30f; // Kecepatan misil
     public float rotateSpeed = 500f; // Kecepatan rotasi misil ke target
+    public float stunDuration = 2f; // Lama stun akibat misil
     public GameObject explosionEffect;
     public GameObject targetIndicatorPrefab; // UI Target (Prefab)
 
@@ -22,7 +23,7 @@ public class Misille : MonoBehaviour
     {
         if (target == null)
         {
-            Destroy(gameObject, 3f); // Hancurkan jika tidak ada target
+            Destroy(gameObject, 3f); // Hancurkan jika tidak ada target setelah 3 detik
             return;
         }
 
@@ -39,6 +40,20 @@ public class Misille : MonoBehaviour
     {
         if (other.CompareTag("Player")) // Jika menyentuh target
         {
+            KartController playerKart = other.GetComponent<KartController>();
+            Shield kartShield = other.GetComponent<Shield>();
+
+            if (kartShield != null && kartShield.IsShieldActive)
+            {
+                Debug.Log("Misil mengenai pemain, tetapi shield aktif!");
+                return; // Tidak memberikan stun jika shield aktif
+            }
+
+            if (playerKart != null)
+            {
+                playerKart.Stun(stunDuration, "Missile"); // Stun dengan sumber "Missile"
+            }
+
             Explode();
         }
     }
@@ -68,12 +83,15 @@ public class Misille : MonoBehaviour
         {
             target = player.transform;
 
-            // Buat UI indikator target di atas kepala pemain
             if (targetIndicatorPrefab != null)
             {
                 targetIndicator = Instantiate(targetIndicatorPrefab, target.position + new Vector3(0, 2f, 0), Quaternion.identity);
-                targetIndicator.transform.SetParent(target); // Indikator ikut pemain
+                targetIndicator.transform.SetParent(target);
             }
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 }
