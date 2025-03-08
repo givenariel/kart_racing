@@ -7,16 +7,19 @@ TagManager:
   - SlideZone
   - ItemBox
   - StartLine
+  - Trap
+  - Slow
+  - Ground
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Ground
+  - 
   - Water
   - UI
-  - Sphere
-  - Kart
-  - 
+  - kart
+  - sphere
+  - groundLayer
   - 
   - 
   - 
