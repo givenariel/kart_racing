@@ -242,7 +242,7 @@ public class ServerManager : MonoBehaviour
         {
             Debug.Log($"[StartGame] ClientID: {client.Key}, CharacterID: {client.Value.characterId}");
         }
-        
+
         NetworkManager.Singleton.SceneManager.LoadScene(gameplaySceneName, LoadSceneMode.Single);
 
         //Destroy(gameObject);
@@ -269,4 +269,12 @@ public class ServerManager : MonoBehaviour
             Debug.Log("The game is NOT connected to any server.");
         }
     }
+
+    public void SetGameplaySceneName(string sceneName)
+    {
+        gameplaySceneName = sceneName;
+        Debug.Log("Gameplay scene name updated to: " + gameplaySceneName);
+    }
+
+
 }
