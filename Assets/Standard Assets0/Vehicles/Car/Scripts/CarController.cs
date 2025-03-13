@@ -51,15 +51,18 @@ namespace UnityStandardAssets.Vehicles.Car
 
         [SerializeField] private float m_DriftSteerFactor = 1.5f;
         [SerializeField] private float m_DriftTractionFactor = 0.5f;
+        [SerializeField] private Transform forcePointDrift;
 
         private bool isDrifting = false;
         private float originalTraction;
-        private float originalSteerAngle;
+        private float originalSteerHelper;
 
         [SerializeField] private float boostMultiplier = 2f; // Faktor peningkatan kecepatan saat boost
         [SerializeField] private float boostDuration = 3f;   // Durasi boost dalam detik
         public bool isBoosting = false;
         float originalTopSpeed;             // Simpan top speed asli
+        float originalTorque;
+        private float originalDownforce;
 
         [SerializeField] private BoostFXControl boostFX;
         //[SerializeField] private DriftVFXControl driftVFXControl;
@@ -88,6 +91,9 @@ namespace UnityStandardAssets.Vehicles.Car
             m_CurrentTorque = m_FullTorqueOverAllWheels - (m_TractionControl*m_FullTorqueOverAllWheels);
             originalTraction = m_TractionControl;
             originalTopSpeed = m_Topspeed;
+            originalTorque = m_FullTorqueOverAllWheels;
+            originalDownforce = m_Downforce;
+            originalSteerHelper = m_SteerHelper;
         }
 
         public void DriftCheck()
@@ -110,7 +116,11 @@ namespace UnityStandardAssets.Vehicles.Car
             //m_MaximumSteerAngle *= m_DriftSteerFactor;
             m_TractionControl *= m_DriftTractionFactor;
             //driftVFXControl.OnPlayDriftVFX();
+            m_FullTorqueOverAllWheels *= 2.8f;
+            m_Downforce *= 2.5f;
+            m_SteerHelper *= 0.4f;
         }
+
 
         private void StopDrift()
         {
@@ -125,7 +135,11 @@ namespace UnityStandardAssets.Vehicles.Car
                     m_WheelColliders[i].motorTorque = -m_ReverseTorque * 1;
                 
             }
-
+            m_FullTorqueOverAllWheels = originalTorque;
+            m_Downforce = originalDownforce;
+            m_SteerHelper = originalSteerHelper;
+            m_Rigidbody.angularVelocity = Vector3.zero;
+            /*
             float accel = 20;
             float thrustTorque;
             switch (m_CarDriveType)
@@ -148,10 +162,42 @@ namespace UnityStandardAssets.Vehicles.Car
                     m_WheelColliders[2].motorTorque = m_WheelColliders[3].motorTorque = thrustTorque;
                     break;
 
-            }
-
+            }*/
+            StartCoroutine(ReduceLateralVelocity());
         }
 
+        private IEnumerator ReduceLateralVelocity()
+        {
+            
+            float elapsedTime = 0f;
+            float duration = 0.3f; // Waktu untuk mengurangi gaya samping
+            float lateralReductionFactor = 1f; // 50% dari gaya samping akan dikurangi
+
+            Vector3 startVelocity = m_Rigidbody.linearVelocity;
+            Vector3 forwardVelocity =  transform.forward * 15;
+            Vector3 forwardVelocityFact = transform.forward * Vector3.Dot(m_Rigidbody.linearVelocity, transform.forward); // Komponen maju
+            Vector3 lateralVelocity = m_Rigidbody.linearVelocity - forwardVelocityFact; // Komponen samping
+
+            // Target velocity: masih ada sebagian lateral velocity yang tersisa
+            Vector3 targetVelocity = forwardVelocity + (lateralVelocity * (1 - lateralReductionFactor));
+
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = elapsedTime / duration;
+               
+                // Reduksi velocity lateral dengan Lerp
+                m_Rigidbody.linearVelocity = Vector3.Lerp(startVelocity, targetVelocity, t);
+                //startVelocity = m_Rigidbody.linearVelocity;
+                m_Rigidbody.AddForce(forwardVelocity, ForceMode.Acceleration);
+                yield return null;
+            }
+
+            // Pastikan velocity hanya di komponen maju
+           // m_Rigidbody.linearVelocity = targetVelocity;
+
+           
+        }
 
         public IEnumerator Boost()
         {
@@ -160,10 +206,10 @@ namespace UnityStandardAssets.Vehicles.Car
 
             boostFX.OnPlayBoostFX();
             isBoosting = true;
-            float originalTorque = m_FullTorqueOverAllWheels; // Simpan torque asli
+           ; // Simpan torque asli
             
 
-            m_FullTorqueOverAllWheels *= boostMultiplier;  // Tingkatkan tenaga
+            m_FullTorqueOverAllWheels *= boostMultiplier * 0.8f;  // Tingkatkan tenaga
             m_Topspeed *= boostMultiplier;                 // Tingkatkan kecepatan maksimal
             m_Rigidbody.linearVelocity += transform.forward * 15;
 
@@ -201,6 +247,7 @@ namespace UnityStandardAssets.Vehicles.Car
             }*/
             m_Topspeed = originalTopSpeed;
             boostFX.OnStopBoostFX();
+            m_FullTorqueOverAllWheels = originalTorque;
 
             isBoosting = false;
         }
@@ -281,14 +328,14 @@ namespace UnityStandardAssets.Vehicles.Car
             {
                 steering *= 1.25f; // Tambah efek drift
                 m_SteerAngle = steering * m_MaximumSteerAngle * m_DriftSteerFactor;
-                Vector3 lateralForce = transform.right * -steering * 20;
+                Vector3 lateralForce = transform.right * -steering * 15;
                 m_Rigidbody.AddForce(lateralForce, ForceMode.Acceleration);
                 //m_Rigidbody.AddForce(transform.right * -steering * 45, ForceMode.Impulse);
-                Vector3 rearDriftForce = transform.right * -steering * (1 - 0.5f) *2* 2;
+                Vector3 rearDriftForce = transform.right * -steering * (1 - 0.2f) *1.5f* 0.0330f * CurrentSpeed + (transform.forward * 0.015f * CurrentSpeed * 35 ) ;
                 //Vector3 rearDriftForce = transform.right * steering * -1;
                 rearDriftForce.y = 0f;
                //m_Rigidbody.linearVelocity *= 0.98f;
-                m_Rigidbody.AddForceAtPosition(rearDriftForce, transform.position - transform.forward * 1.5f, ForceMode.Acceleration);
+                m_Rigidbody.AddForceAtPosition(rearDriftForce, forcePointDrift.position, ForceMode.Acceleration);
             }
             else
             {

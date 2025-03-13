@@ -9,6 +9,8 @@ namespace UnityStandardAssets.Vehicles.Car
 
         private Renderer m_Renderer;
 
+        [SerializeField] Light[] lampBlk = new Light[4];
+
 
         private void Start()
         {
@@ -19,7 +21,13 @@ namespace UnityStandardAssets.Vehicles.Car
         private void Update()
         {
             // enable the Renderer when the car is braking, disable it otherwise.
-            m_Renderer.enabled = car.BrakeInput > 0f;
+            for  (int i = 0; i < lampBlk.Length; i++)
+            {
+                lampBlk[i].enabled = car.BrakeInput > 0f;
+            }
+            //m_Renderer.enabled = car.BrakeInput > 0f;
         }
+
+
     }
 }
