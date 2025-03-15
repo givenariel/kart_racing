@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: CharacterDatabase
   m_EditorClassIdentifier: 
   characters:
-  - {fileID: 11400000, guid: 292d4ae7506d2414294f9a70cd5095a2, type: 2}
-  - {fileID: 11400000, guid: 2cbef8e2e945e984d82cd29e7be1b7d9, type: 2}
   - {fileID: 11400000, guid: 44504751864a0334b9b6692f14057295, type: 2}
+  - {fileID: 11400000, guid: 5042d98eafa50174c8834bf3819ad4a0, type: 2}

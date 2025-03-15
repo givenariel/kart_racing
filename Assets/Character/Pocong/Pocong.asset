@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a09cce547a2b40e40b3e9abcc83ad2a2, type: 3}
   m_Name: Pocong
   m_EditorClassIdentifier: 
-  id: 3
+  id: 2
   displayName: Pocong
   icon: {fileID: 21300000, guid: 26cffd5befa9f3c42aa09c1df8152a56, type: 3}
-  introPrefabs: {fileID: 1558150375903958012, guid: c9edb398928340346ad26aec3ea7e06c, type: 3}
-  gameplayPrefab: {fileID: 7590283718756917349, guid: c9edb398928340346ad26aec3ea7e06c, type: 3}
+  introPrefabs: {fileID: 6731188383621533654, guid: 2ace7e77b56e2d74dbc0440a962c39aa, type: 3}
+  gameplayPrefab: {fileID: 8499614481440921656, guid: 2ace7e77b56e2d74dbc0440a962c39aa, type: 3}
