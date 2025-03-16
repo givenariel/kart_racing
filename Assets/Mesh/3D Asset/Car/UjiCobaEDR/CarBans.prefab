@@ -310,7 +310,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1550909842364219632
 Transform:
   m_ObjectHideFlags: 0
@@ -6203,7 +6203,7 @@ WheelCollider:
     m_ExtremumValue: 0.7
     m_AsymptoteSlip: 0.4
     m_AsymptoteValue: 1.09
-    m_Stiffness: 1.25
+    m_Stiffness: 1.3
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -6427,18 +6427,18 @@ MonoBehaviour:
   - {fileID: 6635258722663580395}
   - {fileID: 4567973681357672535}
   m_CentreOfMassOffset: {x: 0, y: -0.5, z: 0}
-  m_MaximumSteerAngle: 25
-  m_SteerHelper: 0.5
-  m_TractionControl: 0.9
-  m_FullTorqueOverAllWheels: 1500
-  m_ReverseTorque: 1000
-  m_MaxHandbrakeTorque: 2000
+  m_MaximumSteerAngle: 35
+  m_SteerHelper: 0.4
+  m_TractionControl: 0.95
+  m_FullTorqueOverAllWheels: 2500
+  m_ReverseTorque: 500
+  m_MaxHandbrakeTorque: 1000
   m_Downforce: 500
   m_SpeedType: 0
-  m_Topspeed: 75
+  m_Topspeed: 100
   m_RevRangeBoundary: 1
   m_SlipLimit: 0.975
-  m_BrakeTorque: 20000
+  m_BrakeTorque: 2000
   m_DriftSteerFactor: 1.2
   m_DriftTractionFactor: 0.3
   forcePointDrift: {fileID: 5491017660809166065}
@@ -7125,7 +7125,7 @@ WheelCollider:
     m_ExtremumValue: 0.29
     m_AsymptoteSlip: 0.4
     m_AsymptoteValue: 0.55
-    m_Stiffness: 1.9
+    m_Stiffness: 2
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -7578,7 +7578,7 @@ WheelCollider:
     m_ExtremumValue: 0.7
     m_AsymptoteSlip: 0.4
     m_AsymptoteValue: 1.09
-    m_Stiffness: 1.25
+    m_Stiffness: 1.3
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -7764,7 +7764,7 @@ WheelCollider:
     m_ExtremumValue: 0.29
     m_AsymptoteSlip: 0.4
     m_AsymptoteValue: 0.55
-    m_Stiffness: 1.9
+    m_Stiffness: 2
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -8226,7 +8226,7 @@ Transform:
   m_GameObject: {fileID: 7060044602950043829}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1.24}
+  m_LocalPosition: {x: 0, y: 0, z: -1.082}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

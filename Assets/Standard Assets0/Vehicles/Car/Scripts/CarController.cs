@@ -116,9 +116,9 @@ namespace UnityStandardAssets.Vehicles.Car
             //m_MaximumSteerAngle *= m_DriftSteerFactor;
             m_TractionControl *= m_DriftTractionFactor;
             //driftVFXControl.OnPlayDriftVFX();
-            m_FullTorqueOverAllWheels *= 2.8f;
-            m_Downforce *= 2.5f;
-            m_SteerHelper *= 0.4f;
+            m_FullTorqueOverAllWheels *= 5.5f;
+            m_Downforce *= 1.5f;
+            m_SteerHelper *= 0.35f;
         }
 
 
@@ -187,16 +187,26 @@ namespace UnityStandardAssets.Vehicles.Car
                 float t = elapsedTime / duration;
                
                 // Reduksi velocity lateral dengan Lerp
-                m_Rigidbody.linearVelocity = Vector3.Lerp(startVelocity, targetVelocity, t);
+                m_Rigidbody.linearVelocity = Vector3.Lerp(startVelocity, targetVelocity, t * 0.9f);
                 //startVelocity = m_Rigidbody.linearVelocity;
                 m_Rigidbody.AddForce(forwardVelocity, ForceMode.Acceleration);
                 yield return null;
             }
+            elapsedTime = 0f;
+            while (elapsedTime < 0.4f)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = elapsedTime / duration;
+
+                
+                m_Rigidbody.AddForce(forwardVelocity * 0.35f, ForceMode.Acceleration);
+                yield return null;
+            }
 
             // Pastikan velocity hanya di komponen maju
-           // m_Rigidbody.linearVelocity = targetVelocity;
+            // m_Rigidbody.linearVelocity = targetVelocity;
 
-           
+
         }
 
         public IEnumerator Boost()
@@ -328,10 +338,10 @@ namespace UnityStandardAssets.Vehicles.Car
             {
                 steering *= 1.25f; // Tambah efek drift
                 m_SteerAngle = steering * m_MaximumSteerAngle * m_DriftSteerFactor;
-                Vector3 lateralForce = transform.right * -steering * 15;
+                Vector3 lateralForce = transform.right * -steering * 8 + (transform.forward * 0.015f * CurrentSpeed * 25);
                 m_Rigidbody.AddForce(lateralForce, ForceMode.Acceleration);
                 //m_Rigidbody.AddForce(transform.right * -steering * 45, ForceMode.Impulse);
-                Vector3 rearDriftForce = transform.right * -steering * (1 - 0.2f) *1.5f* 0.0330f * CurrentSpeed + (transform.forward * 0.015f * CurrentSpeed * 35 ) ;
+                Vector3 rearDriftForce = transform.right * -steering * (1 - 0.2f) *6f* (0.4f * CurrentSpeed) * Time.deltaTime ;
                 //Vector3 rearDriftForce = transform.right * steering * -1;
                 rearDriftForce.y = 0f;
                //m_Rigidbody.linearVelocity *= 0.98f;
@@ -394,7 +404,7 @@ namespace UnityStandardAssets.Vehicles.Car
 
         private void ApplyDrive(float accel, float footbrake)
         {
-            accel *=2;
+            accel *=3;
             
             float thrustTorque;
             switch (m_CarDriveType)

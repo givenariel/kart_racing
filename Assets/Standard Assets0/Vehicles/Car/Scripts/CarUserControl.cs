@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.UI;
 using UnityStandardAssets.CrossPlatformInput;
 
@@ -25,6 +26,7 @@ namespace UnityStandardAssets.Vehicles.Car
             {
                 StartCoroutine(m_Car.Boost());
             }
+            m_Car.DriftCheck();
         }
         private void FixedUpdate()
         {
@@ -38,6 +40,7 @@ namespace UnityStandardAssets.Vehicles.Car
             m_Car.Move(h, v, v, 0f);
 #endif
 
+            
             speedTeks.text = m_Car.CurrentSpeed.ToString();
         }
     }
