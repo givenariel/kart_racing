@@ -24,7 +24,7 @@ public class PlayerCards : MonoBehaviour
             characterIconImage.enabled = false;
         }
 
-        playerNameText.text = state.IsLockedIn? $"Player{state.ClientId}" : $"Player {state.ClientId} \n Picking...";
+        playerNameText.text = state.IsLockedIn ? $"Player{state.ClientId}" : $"Player {state.ClientId} \n Picking...";
 
         visuals.SetActive(true);
 
@@ -33,6 +33,18 @@ public class PlayerCards : MonoBehaviour
     public void DisableDisplay()
     {
         visuals.SetActive(false);
+    }
+
+    private string GetPlayerName(ulong clientId)
+    {
+        var client = ServerManager.instance?.GetClientData(clientId);
+        if (client != null)
+        {
+            Debug.Log($"[PlayerCards] Found ClientData for {clientId}: {client.playerName}");
+            return client.playerName;
+        }
+        Debug.Log($"[PlayerCards] ClientData NOT found for {clientId}!");
+        return $"Player{clientId}";
     }
 
 }

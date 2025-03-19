@@ -4,56 +4,77 @@ using TMPro;
 
 public class PositionManager : NetworkBehaviour
 {
-    /*private ulong playerID;
-    private int currentPosition = 1;
-    [SerializeField]private RaceManager raceManager;*/
+    [SerializeField] private TextMeshProUGUI positionText; // Assign in Inspector
+    [SerializeField] private GameObject uiCanvas; // Assign the UI Canvas in Inspector
 
-    [SerializeField] private GameObject uiCanvas; // Assign UI Canvas holding the position text
-    //[SerializeField] private TextMeshProUGUI positionText;
-
-    /*void Awake()
+    private void Start()
     {
-        playerID = NetworkObject.OwnerClientId;
-        raceManager = RaceManager.Instance;
-    }*/
-
-    void Start()
-    {
-        if (!IsOwner)
+        // Ensure the UI is only displayed for the local player
+        if (IsLocalPlayer) // Ensures the UI is active only for the local player
         {
             if (uiCanvas != null)
             {
-                Destroy(uiCanvas); // Destroy UI for non-owners in Start()
+                uiCanvas.SetActive(true);
             }
+        }
+
+
+        // Initialize the UI for the local player (client or host)
+        if (uiCanvas != null)
+        {
+            uiCanvas.SetActive(true); // Ensure the UI is active for the local player
+        }
+
+        if (positionText != null)
+        {
+            positionText.text = "Position: -"; // Default text before the first update
+        }
+
+        // Start updating the position every second
+        InvokeRepeating(nameof(UpdatePosition), 1f, 1f);
+    }
+
+    private void UpdatePosition()
+    {
+        if (RaceManager.Instance == null)
+        {
+            Debug.LogWarning("RaceManager instance is not available.");
             return;
         }
 
-        //InvokeRepeating(nameof(UpdatePosition), 1f, 1f); // Update position every second
+        Debug.Log($"Requesting position update for Player {NetworkObject.OwnerClientId}");
+        RequestPositionUpdateServerRpc(NetworkObject.OwnerClientId);
     }
 
-    /*private void UpdatePosition()
-    {
-        if (raceManager == null) return;
 
-        RequestPositionUpdateServerRpc(playerID);
-    }
-
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void RequestPositionUpdateServerRpc(ulong requestingPlayerID)
     {
-        int position = raceManager.GetPlayerPosition(requestingPlayerID);
-        UpdatePositionClientRpc(position);
+        if (RaceManager.Instance == null) return;
+
+        int position = RaceManager.Instance.GetPlayerPosition(requestingPlayerID);
+
+        Debug.Log($"[Server] Player {requestingPlayerID} is in Position {position}");
+
+        UpdatePositionClientRpc(requestingPlayerID, position);
     }
 
-    [ClientRpc]
-    private void UpdatePositionClientRpc(int newPosition)
-    {
-        if (!IsOwner) return; // Ensure only the owner updates their UI
 
-        currentPosition = newPosition;
+
+    [ClientRpc]
+    private void UpdatePositionClientRpc(ulong playerID, int newPosition)
+    {
+        Debug.Log($"[ClientRpc] Updating UI for Player {playerID}, Position: {newPosition}, Local Player: {NetworkManager.Singleton.LocalClientId}");
+
+        if (playerID != NetworkManager.Singleton.LocalClientId) return;
+
         if (positionText != null)
         {
-            positionText.text = $"Position: {currentPosition}/{raceManager.GetTotalPlayers()}";
+            positionText.text = ""; // Force UI refresh
+            positionText.text = $"Position: {newPosition}/{RaceManager.Instance.GetTotalPlayers()}";
         }
-    }*/
+    }
+
+
+
 }

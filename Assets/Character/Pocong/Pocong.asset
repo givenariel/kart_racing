@@ -16,4 +16,5 @@ MonoBehaviour:
   displayName: Pocong
   icon: {fileID: 21300000, guid: 26cffd5befa9f3c42aa09c1df8152a56, type: 3}
   introPrefabs: {fileID: 6731188383621533654, guid: 2ace7e77b56e2d74dbc0440a962c39aa, type: 3}
+  introVideo: {fileID: 32900000, guid: 6b2d88c3a9f021e489029e453ae8a6cc, type: 3}
   gameplayPrefab: {fileID: 8499614481440921656, guid: 2ace7e77b56e2d74dbc0440a962c39aa, type: 3}

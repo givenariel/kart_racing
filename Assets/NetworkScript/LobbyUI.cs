@@ -5,7 +5,7 @@ using TMPro;
 public class LobbyUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text roomCodeText;
-    [SerializeField] private TMP_Dropdown sceneDropdown;
+    
 
     private void Start()
     {
@@ -14,10 +14,6 @@ public class LobbyUI : MonoBehaviour
             roomCodeText.text = "Room Code: " + RoomData.RoomCode;
         }
 
-        if (sceneDropdown != null)
-        {
-            sceneDropdown.onValueChanged.AddListener(OnSceneSelected);
-        }
         else
         {
             Debug.LogError("SceneDropdown is not assigned in the inspector.");
@@ -35,20 +31,8 @@ public class LobbyUI : MonoBehaviour
         }
     }
 
-    private void OnSceneSelected(int index)
+   /* public void OnGoToCharacterSelection()
     {
-        // Retrieve the selected scene name from the dropdown's option text.
-        string selectedScene = sceneDropdown.options[index].text;
-        Debug.Log("Selected gameplay scene: " + selectedScene);
-
-        // Update the gameplay scene name in the ServerManager.
-        if (ServerManager.instance != null)
-        {
-            ServerManager.instance.SetGameplaySceneName(selectedScene);
-        }
-        else
-        {
-            Debug.LogError("ServerManager instance not found!");
-        }
-    }
+        ServerManager.instance.GoToCharacterSelect();
+    }*/
 }

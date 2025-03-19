@@ -7,7 +7,8 @@ public class RaceManager : NetworkBehaviour
 {
     public static RaceManager Instance;
     public int totalLapsToWin = 3;
-
+    [SerializeField] private List<string> debugPlayerPositions = new List<string>();
+    [SerializeField] private List<string> debugRegisteredPlayers = new List<string>();
     private Dictionary<ulong, int> playerLaps = new Dictionary<ulong, int>();
     private Dictionary<ulong, int> playerCheckpoints = new Dictionary<ulong, int>();
     private Dictionary<ulong, float> checkpointTimestamps = new Dictionary<ulong, float>();
@@ -15,6 +16,13 @@ public class RaceManager : NetworkBehaviour
     private void Awake()
     {
         if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
+
+    private void Start()
+    {
+        ulong localPlayerID = NetworkManager.Singleton.LocalClientId;
+        RegisterPlayer(localPlayerID);
     }
 
     public override void OnNetworkSpawn()
@@ -24,16 +32,32 @@ public class RaceManager : NetworkBehaviour
             playerLaps.Clear();
             playerCheckpoints.Clear();
             checkpointTimestamps.Clear();
+
+            foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+            {
+                RegisterPlayer(client.ClientId);
+            }
         }
     }
 
     public void RegisterPlayer(ulong playerID)
     {
+        Debug.Log($"[RaceManager] Attempting to register Player {playerID}");
+
         if (!playerLaps.ContainsKey(playerID))
         {
             playerLaps[playerID] = 0;
             playerCheckpoints[playerID] = -1;
             checkpointTimestamps[playerID] = Time.time;
+
+            // Add to Inspector List
+            debugRegisteredPlayers.Add($"Player {playerID}");
+
+            Debug.Log($"[RaceManager] Successfully registered Player {playerID}");
+        }
+        else
+        {
+            Debug.LogWarning($"[RaceManager] Player {playerID} is already registered!");
         }
     }
 
@@ -45,7 +69,7 @@ public class RaceManager : NetworkBehaviour
         playerCheckpoints[playerID] = checkpointID;
         checkpointTimestamps[playerID] = Time.time;
 
-        UpdatePositionsClientRpc();
+        UpdatePositionsClientRpc(); // Ensure this is called
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -65,11 +89,24 @@ public class RaceManager : NetworkBehaviour
 
     private List<ulong> GetPlayerPositions()
     {
-        return playerLaps.Keys
-            .OrderByDescending(player => playerLaps[player])  // Higher lap count first
-            .ThenByDescending(player => playerCheckpoints[player]) // Higher checkpoint ID
-            .ThenBy(player => checkpointTimestamps[player]) // Earlier timestamp
-            .ToList();
+        Debug.Log("[RaceManager] Fetching player positions...");
+
+        List<ulong> sortedPlayers = new List<ulong>(playerLaps.Keys);
+
+        foreach (var id in sortedPlayers)
+        {
+            Debug.Log($"[RaceManager] Player {id} is in the race.");
+        }
+
+        sortedPlayers.Sort((a, b) =>
+        {
+            int checkpointComparison = playerCheckpoints[b].CompareTo(playerCheckpoints[a]);
+            if (checkpointComparison != 0) return checkpointComparison;
+
+            return checkpointTimestamps[a].CompareTo(checkpointTimestamps[b]);
+        });
+
+        return sortedPlayers;
     }
 
     [ClientRpc]
@@ -81,7 +118,31 @@ public class RaceManager : NetworkBehaviour
     public int GetPlayerPosition(ulong playerID)
     {
         List<ulong> sortedPlayers = GetPlayerPositions();
+
+        // Update the Debug List for Inspector
+        debugPlayerPositions.Clear();
+        foreach (var id in sortedPlayers)
+        {
+            debugPlayerPositions.Add($"Player {id}: Position {sortedPlayers.IndexOf(id) + 1}");
+        }
+
+        if (!sortedPlayers.Contains(playerID))
+        {
+            Debug.LogWarning($"[RaceManager] Player {playerID} is not in the position list!");
+            return -1; // Return an invalid position if not found
+        }
+
         return sortedPlayers.IndexOf(playerID) + 1;
+    }
+
+    public void UpdatePlayerCheckpoint(ulong playerID, int checkpointIndex)
+    {
+        if (!playerCheckpoints.ContainsKey(playerID)) return;
+
+        playerCheckpoints[playerID] = checkpointIndex;
+        checkpointTimestamps[playerID] = Time.time;
+
+        Debug.Log($"[RaceManager] Updated Player {playerID} -> Checkpoint {checkpointIndex}");
     }
 
     public int GetTotalPlayers()

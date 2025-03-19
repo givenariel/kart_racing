@@ -19,15 +19,17 @@ public class MainMenuUI : MonoBehaviour
     {
         if (ServerManager.instance != null)
         {
+            SetPlayerName();
             ServerManager.instance.StartHost();
         }
     }
 
     public void StartClient()
     {
-        if (roomCodeInput != null && ServerManager.instance != null)
+        if (roomCodeInput != null && ServerManager.instance != null && playerNameInput != null)
         {
-            ServerManager.instance.StartClient(roomCodeInput.text);
+            SetPlayerName();
+            ServerManager.instance.StartClient(roomCodeInput.text, playerNameInput.text);
         }
     }
 }

@@ -6,6 +6,8 @@ using System.Linq;
 using UnityEngine.UI;
 using NUnit.Framework;
 using System.Collections.Generic;
+using UnityEngine.Video;
+using System.Collections;
 
 public class CharacterDisplay : NetworkBehaviour
 {
@@ -18,10 +20,10 @@ public class CharacterDisplay : NetworkBehaviour
     [SerializeField] private PlayerCards[] PlayerCards;
     [SerializeField] private Transform introSpawnPoint;
     [SerializeField] private Button LockInButton;
-
+    [SerializeField] private VideoPlayer introVideoPlayer;
     private GameObject introInstance;
     private List<CharacterSelectButton> characterButtons = new List<CharacterSelectButton>();
-    
+
 
     private void Awake()
     {
@@ -32,7 +34,7 @@ public class CharacterDisplay : NetworkBehaviour
     {
         if (IsClient)
         {
-            Character[] allCharacters = characterDatabase.GetAllCharacter(); 
+            Character[] allCharacters = characterDatabase.GetAllCharacter();
 
             foreach (var character in allCharacters)
             {
@@ -80,7 +82,7 @@ public class CharacterDisplay : NetworkBehaviour
             if (players[i].ClientId == clientId)
             {
                 alreadyExists = true;
-                break; 
+                break;
             }
         }
         if (!alreadyExists)
@@ -118,27 +120,37 @@ public class CharacterDisplay : NetworkBehaviour
 
         characterNameText.text = character.DisplayName;
         characterInfoPanel.SetActive(true);
-        if (introInstance != null)
+
+        // Ensure any previous video is properly stopped and unloaded
+        if (introVideoPlayer.isPlaying)
         {
-            Destroy(introInstance);
+            introVideoPlayer.Stop();
         }
-        introInstance = Instantiate(character.IntroPrefabs, introSpawnPoint);
+
+        introVideoPlayer.clip = character.IntroVideo;
+
+        if (introVideoPlayer.clip != null)
+        {
+            introVideoPlayer.Play(); // Start video playback
+        }
 
         SelectServerRpc(character.Id);
+        StartCoroutine(PlayCharacterIntro(character));
     }
+
 
     [ServerRpc(RequireOwnership = false)]
     private void SelectServerRpc(int characterId, ServerRpcParams severRpcParam = default)
     {
         for (int i = 0; i < players.Count; i++)
         {
-            if (players[i].ClientId != severRpcParam.Receive.SenderClientId) { continue;}
+            if (players[i].ClientId != severRpcParam.Receive.SenderClientId) { continue; }
             if (!characterDatabase.IsvalidCharacterId(characterId)) { return; }
             if (IsCharacterTaken(characterId, true)) { return; }
             players[i] = new CharacterSelectState(
                     players[i].ClientId, characterId,
                     players[i].IsLockedIn);
-            
+
         }
     }
 
@@ -155,10 +167,10 @@ public class CharacterDisplay : NetworkBehaviour
             if (players[i].ClientId != severRpcParam.Receive.SenderClientId) { continue; }
             if (!characterDatabase.IsvalidCharacterId(players[i].CharacterId)) { return; }
             if (IsCharacterTaken(players[i].CharacterId, true)) { return; }
-                    players[i] = new CharacterSelectState(
-                        players[i].ClientId,
-                        players[i].CharacterId,
-                        true);
+            players[i] = new CharacterSelectState(
+                players[i].ClientId,
+                players[i].CharacterId,
+                true);
 
         }
 
@@ -172,7 +184,7 @@ public class CharacterDisplay : NetworkBehaviour
             ServerManager.instance.SetCharacter(player.ClientId, player.CharacterId);
         }
 
-        ServerManager.instance.StartGame();
+        ServerManager.instance.GoToMapSelection();
     }
 
     private void HandlePlayerStateChange(NetworkListEvent<CharacterSelectState> changeEvent)
@@ -231,6 +243,23 @@ public class CharacterDisplay : NetworkBehaviour
             }
         }
         return false;
+    }
+
+    IEnumerator PlayCharacterIntro(Character character)
+    {
+        introVideoPlayer.clip = character.IntroVideo;
+
+        if (introVideoPlayer.clip != null)
+        {
+            introVideoPlayer.Prepare();
+            while (!introVideoPlayer.isPrepared)
+            {
+                yield return null; // Wait until video is prepared
+            }
+            introVideoPlayer.Play();
+        }
+
+        SelectServerRpc(character.Id);
     }
 
 }

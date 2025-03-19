@@ -9,6 +9,7 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,6 +18,7 @@ public class ServerManager : MonoBehaviour
     [Header("Scenes")]
     [SerializeField] private string lobbySceneName = "Lobby";
     [SerializeField] private string characterSelectSceneName = "CharacterSelect";
+    [SerializeField] private string MapSelectScene = "Map";
     [SerializeField] private string gameplaySceneName = "Gameplay";
 
     public static ServerManager instance;
@@ -122,7 +124,7 @@ public class ServerManager : MonoBehaviour
             Debug.LogError($"Lobby creation failed: {e.Message}");
         }
     }
-    public async void StartClient(string inputRoomCode)
+    public async void StartClient(string inputRoomCode, string playerName)
     {
         try
         {
@@ -148,7 +150,6 @@ public class ServerManager : MonoBehaviour
                 return;
             }
 
-
             Debug.Log("Joining Relay...");
             JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(inputRoomCode);
             Debug.Log($"Relay Joined! Server: {allocation.RelayServer.IpV4}:{allocation.RelayServer.Port}");
@@ -164,6 +165,10 @@ public class ServerManager : MonoBehaviour
 
             Debug.Log("Relay Data Set Successfully! Waiting before StartClient...");
             await Task.Delay(500);  // Ensure relay data is set before starting client
+
+            // Set the player name in the connection request
+            byte[] payload = System.Text.Encoding.UTF8.GetBytes(playerName);
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = payload;
 
             Debug.Log("Starting Client...");
             if (NetworkManager.Singleton.StartClient())
@@ -192,12 +197,15 @@ public class ServerManager : MonoBehaviour
             response.Approved = false;
             return;
         }
+
+        // Deserialize the client's name from the request payload
+        string clientName = System.Text.Encoding.UTF8.GetString(request.Payload);
         response.Approved = true;
         response.CreatePlayerObject = true;
         response.Pending = false;
 
-        ClientData[request.ClientNetworkId] = new ClientData(request.ClientNetworkId, PlayerName);
-        Debug.Log($"Adding Player {request.ClientNetworkId} with name {PlayerName}");
+        ClientData[request.ClientNetworkId] = new ClientData(request.ClientNetworkId, clientName);
+        Debug.Log($"Adding Player {request.ClientNetworkId} with name {clientName}");
     }
 
     private void OnNetworkReady()
@@ -243,9 +251,8 @@ public class ServerManager : MonoBehaviour
             Debug.Log($"[StartGame] ClientID: {client.Key}, CharacterID: {client.Value.characterId}");
         }
 
+        Debug.Log($"Loading gameplay scene: {gameplaySceneName}");
         NetworkManager.Singleton.SceneManager.LoadScene(gameplaySceneName, LoadSceneMode.Single);
-
-        //Destroy(gameObject);
     }
 
     public void CheckNetworkStatus()
@@ -276,5 +283,18 @@ public class ServerManager : MonoBehaviour
         Debug.Log("Gameplay scene name updated to: " + gameplaySceneName);
     }
 
+    public ClientData GetClientData(ulong clientId)
+    {
+        return ClientData.TryGetValue(clientId, out var client) ? client : null;
+    }
 
+    public void GoToMapSelection()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            Debug.Log("Moving to Map Selection...");
+            NetworkManager.Singleton.SceneManager.LoadScene(MapSelectScene, LoadSceneMode.Single);
+        }
+
+    }
 }

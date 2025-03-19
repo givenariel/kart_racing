@@ -318,8 +318,6 @@ GameObject:
   - component: {fileID: 7871332582279594848}
   - component: {fileID: 7445804251902951270}
   - component: {fileID: 8379959989426385948}
-  - component: {fileID: 6347526167753001032}
-  - component: {fileID: 1922486740983283712}
   m_Layer: 5
   m_Name: PlayerUI
   m_TagString: Untagged
@@ -414,33 +412,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &6347526167753001032
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1212007057803241512}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af7ca06ddc14a9c4eb648697de9dd2e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  positionText: {fileID: 5286105395805650739}
---- !u!114 &1922486740983283712
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1212007057803241512}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a899b87e78509794cac0238a2db3d9d5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  uiCanvas: {fileID: 1212007057803241512}
 --- !u!1 &1259202168244998112
 GameObject:
   m_ObjectHideFlags: 0
@@ -3273,7 +3244,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  totalCheckpoints: 0
   lapText: {fileID: 7120706594679636007}
   winUI: {fileID: 2080130372473106257}
   loseUI: {fileID: 8548739380539401449}
