@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: fb1e353e626b4d498b20454c5086060e
+timeCreated: 1641741144
+AssetOrigin:
+  serializedVersion: 1
+  productId: 219990
+  packageName: Digger - Advanced Operations
+  packageVersion: 1.0
+  assetPath: Assets/Digger/Modules/AdvancedOperations/Splines/ProceduralGeneration/CaveGenerator.cs
+  uploadId: 495786

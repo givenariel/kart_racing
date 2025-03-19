@@ -10,8 +10,13 @@ TerrainLayer:
   m_DiffuseTexture: {fileID: 2800000, guid: 22e8026900abaf7488d461af5ed017d2, type: 3}
   m_NormalMapTexture: {fileID: 2800000, guid: b521fad365c64394eb8fdf8ff97f3dea, type: 3}
   m_MaskMapTexture: {fileID: 0}
+<<<<<<< Updated upstream
   m_TileSize: {x: 1, y: 2000}
   m_TileOffset: {x: 0, y: 6.35}
+=======
+  m_TileSize: {x: 0, y: 0}
+  m_TileOffset: {x: 0, y: 0}
+>>>>>>> Stashed changes
   m_Specular: {r: 0, g: 0, b: 0, a: 0}
   m_Metallic: 0
   m_Smoothness: 0

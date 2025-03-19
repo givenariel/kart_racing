@@ -3,7 +3,17 @@ guid: 49bad4dec1b9d2341a2d0cb2e71036c5
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BatangPisang
+    second: {fileID: 2100000, guid: ce3b7ea9c5606984db4e92894e52e59a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Daunpisang
+    second: {fileID: 2100000, guid: 907c62367a26fd64c963a39889f565aa, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
