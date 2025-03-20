@@ -99,10 +99,10 @@ SphereCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 191
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
@@ -125,6 +125,11 @@ MonoBehaviour:
   slowDuration: 3
   slowMultiplier: 0.5
   slowTrapPrefab: {fileID: 5077729897554343111, guid: 05c6b3ca1e4c8664ea5d80f7ef81698c, type: 3}
+  hasSpawnedTrap: 0
+  ownerTransform: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!54 &2382036432954587213
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -7,6 +7,8 @@ TagManager:
   - SlideZone
   - ItemBox
   - StartLine
+  - Trap
+  - Ground
   layers:
   - Default
   - TransparentFX

@@ -23,6 +23,7 @@ public class CarController : MonoBehaviour
     private float originalMaxSpeed;
     private IA_Default inputActions;
     private PlayerInventory playerInventory;
+    [SerializeField] Shield shieldHandler;
 
     private void Start()
     {
@@ -83,6 +84,7 @@ public class CarController : MonoBehaviour
 
         sign = Mathf.Sign(carVelocity.z);
         TurnMultiplyer = turnCurve.Evaluate(carVelocity.magnitude / maxSpeed);
+        playerInventory.dirMove = (moveInput >= 0) ? 1 : -1;
 
         // Debug.Log("Move Input = " + moveInput + 
         // " Turn Input = " + turnInput + 
@@ -172,7 +174,7 @@ public class CarController : MonoBehaviour
 
     public void Stun(float duration, string source)
     {
-        if (!isStunned)
+        if (!isStunned && !shieldHandler.CheckShield())
         {
             isStunned = true;
             Debug.Log("Mobil terkena stun dari: " + source + " selama " + duration + " detik!");
@@ -182,7 +184,9 @@ public class CarController : MonoBehaviour
     //TODO : Habis UTS Ganti Boost Logic
     private IEnumerator StunCoroutine(float duration)
     {
+        inputActions.Player.Movement.Disable();
         yield return new WaitForSeconds(duration);
+        inputActions.Player.Movement.Enable();
         isStunned = false;
         Debug.Log("Stun selesai.");
     }
@@ -223,7 +227,7 @@ public class CarController : MonoBehaviour
 
     public void ApplySlowEffect(float slowAmount, float duration)
     {
-        if (!isSlowed)
+        if (!isSlowed && !shieldHandler.CheckShield())
         {
             isSlowed = true;
             maxSpeed *= slowAmount;

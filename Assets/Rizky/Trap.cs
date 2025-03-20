@@ -5,10 +5,11 @@ public class Trap : MonoBehaviour
 {
     [SerializeField] private float disableDuration = 0.5f;
     public GameObject stunVFX;
+    public Transform ownerTransform;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && other.transform != ownerTransform)
         {
             CarController playerKart = other.GetComponent<CarController>();
             Shield kartShield = other.GetComponent<Shield>();

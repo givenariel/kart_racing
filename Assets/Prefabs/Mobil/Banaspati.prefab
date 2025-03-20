@@ -805,7 +805,7 @@ Transform:
   m_GameObject: {fileID: 1792554960042900715}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.23, y: 1.19, z: 2.88}
+  m_LocalPosition: {x: 0.22, y: 2.17, z: 2.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1094,7 +1094,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.106028125, g: 0.06132078, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.8893428, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1633,6 +1633,7 @@ GameObject:
   - component: {fileID: 1573255192141658818}
   - component: {fileID: 9172919505978497236}
   - component: {fileID: 4237014028736045022}
+  - component: {fileID: 4520232780395997764}
   m_Layer: 7
   m_Name: Banaspati
   m_TagString: Player
@@ -1796,18 +1797,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemImages:
-  - {fileID: 1280620195053358429}
   - {fileID: 3262881813752333254}
-  - {fileID: 2161787703204565824}
-  - {fileID: 2022833509549779426}
+  - {fileID: 1280620195053358429}
   - {fileID: 2879398125753861230}
+  - {fileID: 2022833509549779426}
+  - {fileID: 2161787703204565824}
   trapPrefab: {fileID: 3449012457916645008, guid: e8b3ede5ae2eebf4dbf6d6b4fde9413a, type: 3}
   slowTrapPrefab: {fileID: 3750480260369714459, guid: f4accf8bfb3bfdc4e91a93974036fa84, type: 3}
   missilePrefab: {fileID: 4717938884008996716, guid: a9f8b4d679051a14cb37d689ff6693f9, type: 3}
   missileSpawn: {fileID: 3442792534013913451}
+  currentItem: 0
   trapSpawn: {fileID: 2418021974263476336}
   throwSpawn: {fileID: 2429559390521491358}
   throwForce: 10
+  carIdManager: {fileID: 0}
+  dirMove: 0
 --- !u!114 &9172919505978497236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1902,6 +1906,7 @@ MonoBehaviour:
   BodyMesh: {fileID: 3306498534143514716}
   boostPower: 0
   slowEffectParticle: {fileID: 0}
+  shieldHandler: {fileID: 4520232780395997764}
 --- !u!114 &4237014028736045022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1919,6 +1924,20 @@ MonoBehaviour:
   lapText: {fileID: 7779147807937832421}
   winUI: {fileID: 3379068507124970088}
   loseUI: {fileID: 8413243921832931084}
+--- !u!114 &4520232780395997764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5142411952155258010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9c9361668f507c44953f3c054dc5cb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shieldDuration: 5
+  shieldVFX: {fileID: 0}
 --- !u!1 &5732993973156342032
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,17 +5,20 @@ public class ThrowableSlowTrap : MonoBehaviour
     public float slowDuration = 3f; // Durasi efek slow
     public float slowMultiplier = 0.5f; // Seberapa lambat pemain jadi
     public GameObject slowTrapPrefab; // Prefab jebakan setelah terkena tanah
-    private bool hasSpawnedTrap = false; // Cegah jebakan spawn lebih dari sekali
+    public bool hasSpawnedTrap = false; // Cegah jebakan spawn lebih dari sekali
+    public Transform ownerTransform;
+    [SerializeField] LayerMask groundLayer;
 
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Trigger dengan: " + other.name); // Debug untuk cek trigger
 
-        if (other.CompareTag("Player")) // Jika kena pemain, beri efek slow
+        if (other.CompareTag("Player") && other.transform != ownerTransform) // Jika kena pemain, beri efek slow
         {
             CarController playerKart = other.GetComponent<CarController>();
             if (playerKart != null)
             {
+                hasSpawnedTrap = true;
                 Debug.Log("Mengenai player, memberikan efek slow!");
                 playerKart.ApplySlowEffect(slowMultiplier, slowDuration);
                 Destroy(gameObject); // Hancurkan bola setelah mengenai player
@@ -32,8 +35,43 @@ public class ThrowableSlowTrap : MonoBehaviour
                 return;
             }
 
-            GameObject trap = Instantiate(slowTrapPrefab, transform.position, Quaternion.identity);
-            ThrowableSlowTrap trapScript = trap.GetComponent<ThrowableSlowTrap>();
+            ThrowableSlowTrap trapScript = null;
+
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, -transform.up, out hit, 10f, groundLayer))
+            {
+                // Posisi titik singgung
+                Vector3 contactPoint = hit.point;
+
+                // Rotasi sejajar permukaan ground
+                Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+
+                // Opsional: Inisiasi objek baru
+                GameObject trap = Instantiate(slowTrapPrefab, contactPoint, targetRotation);
+                trapScript = trap.GetComponent<ThrowableSlowTrap>();
+                trapScript.ownerTransform = ownerTransform;
+            }
+            else if (Physics.Raycast(transform.position, transform.up, out hit, 10f, groundLayer))
+            {
+                // Posisi titik singgung
+                Vector3 contactPoint = hit.point;
+
+                // Rotasi sejajar permukaan ground
+                Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+
+                // Opsional: Inisiasi objek baru
+                GameObject trap = Instantiate(slowTrapPrefab, contactPoint, targetRotation);
+                trapScript = trap.GetComponent<ThrowableSlowTrap>();
+                trapScript.ownerTransform = ownerTransform;
+            }
+            else
+            {
+                GameObject trap = Instantiate(slowTrapPrefab, transform.position, Quaternion.identity);
+                trapScript = trap.GetComponent<ThrowableSlowTrap>();
+                trapScript.ownerTransform = ownerTransform;
+            }
+
+            
 
             if (trapScript != null)
             {
@@ -59,7 +97,7 @@ public class ThrowableSlowTrap : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (CompareTag("Trap") && other.CompareTag("Player")) // Jika pemain melewati jebakan
+        if (CompareTag("Trap") && other.CompareTag("Player") && other.transform != ownerTransform) // Jika pemain melewati jebakan
         {
             CarController playerKart = other.GetComponent<CarController>();
             if (playerKart != null)

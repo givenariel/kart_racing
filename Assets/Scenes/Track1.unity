@@ -10418,6 +10418,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: -7070651104903318370, guid: 19428f652816a6045b0d3b1e4ee466a7, type: 3}
+      propertyPath: m_TagString
+      value: Ground
+      objectReference: {fileID: 0}
     - target: {fileID: -2008352125699446421, guid: 19428f652816a6045b0d3b1e4ee466a7, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.2
@@ -10438,9 +10442,17 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 19428f652816a6045b0d3b1e4ee466a7, type: 3}
+      propertyPath: m_TagString
+      value: Ground
+      objectReference: {fileID: 0}
     - target: {fileID: 3566454230575457071, guid: 19428f652816a6045b0d3b1e4ee466a7, type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3566454230575457071, guid: 19428f652816a6045b0d3b1e4ee466a7, type: 3}
+      propertyPath: m_TagString
+      value: Ground
       objectReference: {fileID: 0}
     - target: {fileID: 7616713866129072718, guid: 19428f652816a6045b0d3b1e4ee466a7, type: 3}
       propertyPath: m_LocalScale.x
@@ -23432,6 +23444,7 @@ GameObject:
   - component: {fileID: 1617318469}
   - component: {fileID: 1617318468}
   - component: {fileID: 1617318467}
+  - component: {fileID: 1617318472}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -23484,6 +23497,7 @@ MonoBehaviour:
   spawnPoints:
   - {fileID: 2104849131}
   - {fileID: 405357509}
+  carIdManager: {fileID: 1617318472}
 --- !u!114 &1617318470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23524,6 +23538,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1617318472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1617318466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 904865617950dca418fe92df595a0b89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  players: []
 --- !u!1001 &1621891083
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30949,7 +30976,7 @@ GameObject:
   - component: {fileID: 2099623717}
   m_Layer: 3
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647

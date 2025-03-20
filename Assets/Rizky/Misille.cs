@@ -1,4 +1,6 @@
+using NUnit.Framework;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Missile : MonoBehaviour
 {
@@ -11,6 +13,9 @@ public class Missile : MonoBehaviour
     private Transform target;
     private Rigidbody rb;
     private GameObject targetIndicator; // Menyimpan indikator yang muncul
+    public Transform ownerTransform;
+
+    public List<Transform> players = new List<Transform>();
 
     void Start()
     {
@@ -30,7 +35,7 @@ public class Missile : MonoBehaviour
         // Arahkan misil ke target
         Vector3 direction = (target.position - transform.position).normalized;
         Quaternion lookRotation = Quaternion.LookRotation(direction);
-        rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, lookRotation, rotateSpeed * Time.fixedDeltaTime));
+        rb.MoveRotation(Quaternion.RotateTowards(transform.localRotation, lookRotation, rotateSpeed * Time.fixedDeltaTime));
 
         // Gerakkan misil maju ke arah target
         rb.linearVelocity = transform.forward * speed;
@@ -40,21 +45,25 @@ public class Missile : MonoBehaviour
     {
         if (other.CompareTag("Player")) // Jika menyentuh target
         {
-            KartController playerKart = other.GetComponent<KartController>();
-            Shield kartShield = other.GetComponent<Shield>();
-
-            if (kartShield != null && kartShield.IsShieldActive)
+            if (ownerTransform != null && other.transform != ownerTransform)
             {
-                Debug.Log("Misil mengenai pemain, tetapi shield aktif!");
-                return; // Tidak memberikan stun jika shield aktif
-            }
+                KartController playerKart = other.GetComponent<KartController>();
+                Shield kartShield = other.GetComponent<Shield>();
 
-            if (playerKart != null)
-            {
-                playerKart.Stun(stunDuration, "Missile"); // Stun dengan sumber "Missile"
-            }
+                if (kartShield != null && kartShield.IsShieldActive)
+                {
+                    Debug.Log("Misil mengenai pemain, tetapi shield aktif!");
+                    return; // Tidak memberikan stun jika shield aktif
+                }
 
-            Explode();
+                if (playerKart != null)
+                {
+                    playerKart.Stun(stunDuration, "Missile"); // Stun dengan sumber "Missile"
+                }
+
+                Explode();
+            }
+            
         }
     }
 
@@ -79,14 +88,17 @@ public class Missile : MonoBehaviour
     private void FindTarget()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+        players.Remove(ownerTransform);
+        Transform targetMisille = players[Random.Range(0, players.Count - 1)];
+        target = targetMisille.transform;
+        if (targetMisille != null)
         {
-            target = player.transform;
+            //target = player.transform;
 
             if (targetIndicatorPrefab != null)
             {
                 targetIndicator = Instantiate(targetIndicatorPrefab, target.position + new Vector3(0, 2f, 0), Quaternion.identity);
-                targetIndicator.transform.SetParent(target);
+                targetIndicator.transform.SetParent(targetMisille);
             }
         }
         else

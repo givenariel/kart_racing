@@ -3260,6 +3260,7 @@ MonoBehaviour:
   BodyMesh: {fileID: 7912577949617168802}
   boostPower: 0
   slowEffectParticle: {fileID: 0}
+  shieldHandler: {fileID: 7082952783633196859}
 --- !u!114 &4588613664386011785
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3304,18 +3305,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemImages:
-  - {fileID: 72163516939708101}
   - {fileID: 6297910381300188919}
-  - {fileID: 451035244806489736}
-  - {fileID: 4727754003391008852}
+  - {fileID: 72163516939708101}
   - {fileID: 6773956552269619609}
+  - {fileID: 4727754003391008852}
+  - {fileID: 451035244806489736}
   trapPrefab: {fileID: 3449012457916645008, guid: e8b3ede5ae2eebf4dbf6d6b4fde9413a, type: 3}
-  slowTrapPrefab: {fileID: 5077729897554343111, guid: 05c6b3ca1e4c8664ea5d80f7ef81698c, type: 3}
+  slowTrapPrefab: {fileID: 3750480260369714459, guid: f4accf8bfb3bfdc4e91a93974036fa84, type: 3}
   missilePrefab: {fileID: 4717938884008996716, guid: a9f8b4d679051a14cb37d689ff6693f9, type: 3}
   missileSpawn: {fileID: 2231564469250951607}
+  currentItem: 0
   trapSpawn: {fileID: 6189212487211183783}
   throwSpawn: {fileID: 4132914134987844715}
   throwForce: 10
+  carIdManager: {fileID: 0}
+  dirMove: 0
 --- !u!1 &6773956552269619609
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,6 +7,7 @@ public class CharacterSpawner : NetworkBehaviour
 {
     [SerializeField] private CharacterDatabase characterDatabase;
     [SerializeField] private List<Transform> spawnPoints = new List<Transform>(); // List of predefined spawn points
+    [SerializeField] private  CarIdManager carIdManager;
 
     private List<Transform> availableSpawnPoints = new List<Transform>(); // Track unused spawn points
 
@@ -39,6 +40,8 @@ public class CharacterSpawner : NetworkBehaviour
                 // Instantiate character at spawn point position with its rotation
                 var characterInstance = Instantiate(character.GameplayPrefab, spawnPoint.position, spawnPoint.rotation);
                 characterInstance.SpawnAsPlayerObject(client.Value.clientId);
+                carIdManager.players.Add(characterInstance.transform);
+                characterInstance.GetComponent<PlayerInventory>().carIdManager = carIdManager;
 
                 Debug.Log($"[CharacterSpawner] Spawned {character.GameplayPrefab.name} at {spawnPoint.position} with rotation {spawnPoint.rotation.eulerAngles}");
             }

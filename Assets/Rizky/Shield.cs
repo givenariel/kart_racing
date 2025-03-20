@@ -57,5 +57,9 @@ public class Shield : MonoBehaviour
         isShieldActive = false;
         Debug.Log("Shield Habis!");
     }
+    public bool CheckShield()
+    {
+        return IsShieldActive;
+    }
 
 }
