@@ -6,6 +6,7 @@ public class PlayerNetwork : NetworkBehaviour
 {
 
     [SerializeField] private CinemachineCamera vc;
+    [SerializeField] private Camera playerCam;
 
     public override void OnNetworkSpawn()
     {
@@ -16,6 +17,7 @@ public class PlayerNetwork : NetworkBehaviour
         else
         {
             vc.Priority = 0;
+            playerCam.gameObject.SetActive(false);
         }
     }
 

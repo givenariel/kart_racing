@@ -40,8 +40,16 @@ public class CharacterSpawner : NetworkBehaviour
                 // Instantiate character at spawn point position with its rotation
                 var characterInstance = Instantiate(character.GameplayPrefab, spawnPoint.position, spawnPoint.rotation);
                 characterInstance.SpawnAsPlayerObject(client.Value.clientId);
-                carIdManager.players.Add(characterInstance.transform);
-                characterInstance.GetComponent<PlayerInventory>().carIdManager = carIdManager;
+                carIdManager.networkObjects.Add(characterInstance);
+
+                //PlayerInventory playerInventory = characterInstance.GetComponent<PlayerInventory>();
+                 
+                // playerInventory.carIdManagerRef.Value = new NetworkObjectReference(carIdManager.GetComponent<NetworkObject>());
+
+                NetworkObject netObj = carIdManager.GetComponent<NetworkObject>();
+                AssignCarIdManagerClientRpc(netObj);
+                characterInstance.GetComponent<PlayerInventory>().SetCarIdManagerRefServerRpc(new NetworkObjectReference(netObj));
+                characterInstance.GetComponent<CarHandler>().carID = client.Value.clientId;
 
                 Debug.Log($"[CharacterSpawner] Spawned {character.GameplayPrefab.name} at {spawnPoint.position} with rotation {spawnPoint.rotation.eulerAngles}");
             }
@@ -49,6 +57,22 @@ public class CharacterSpawner : NetworkBehaviour
             {
                 Debug.LogError($"[CharacterSpawner] Character data not found for CharacterID: {client.Value.characterId}");
             }
+        }
+    }
+
+    [ClientRpc]
+    public void AssignCarIdManagerClientRpc(NetworkObjectReference managerRef)
+    {
+        Debug.Log("[Client] Menerima referensi CarIdManager dari server...");
+
+        if (managerRef.TryGet(out NetworkObject netObj))
+        {
+            carIdManager = netObj.GetComponent<CarIdManager>();
+            Debug.Log($"[Client] carIdManager berhasil diatur lewat RPC: {carIdManager}");
+        }
+        else
+        {
+            Debug.LogError("[Client] Referensi CarIdManager valid tapi NetworkObject tidak ditemukan!");
         }
     }
 }

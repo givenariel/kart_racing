@@ -255,7 +255,7 @@ public partial class @IA_Default: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""35f3faff-f79b-4f55-beee-703cdfa495a0"",
-                    ""path"": ""<Keyboard>/shift"",
+                    ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

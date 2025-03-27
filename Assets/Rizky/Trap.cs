@@ -11,7 +11,7 @@ public class Trap : MonoBehaviour
     {
         if (other.CompareTag("Player") && other.transform != ownerTransform)
         {
-            CarController playerKart = other.GetComponent<CarController>();
+            CarHandler playerKart = other.GetComponent<CarHandler>();
             Shield kartShield = other.GetComponent<Shield>();
 
             if (kartShield != null && kartShield.IsShieldActive)

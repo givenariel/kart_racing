@@ -1,8 +1,9 @@
 using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Netcode;
 
-public class Missile : MonoBehaviour
+public class Missile : NetworkBehaviour
 {
     public float speed = 30f; // Kecepatan misil
     public float rotateSpeed = 500f; // Kecepatan rotasi misil ke target
@@ -22,13 +23,17 @@ public class Missile : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
         FindTarget();
+        
     }
 
     void FixedUpdate()
     {
         if (target == null)
         {
-            Destroy(gameObject, 3f); // Hancurkan jika tidak ada target setelah 3 detik
+            if (IsOwner)
+            {
+                RequestDestroyServerRpc();
+            } // Hancurkan jika tidak ada target setelah 3 detik
             return;
         }
 
@@ -47,25 +52,72 @@ public class Missile : MonoBehaviour
         {
             if (ownerTransform != null && other.transform != ownerTransform)
             {
-                KartController playerKart = other.GetComponent<KartController>();
-                Shield kartShield = other.GetComponent<Shield>();
-
-                if (kartShield != null && kartShield.IsShieldActive)
+                if (IsOwner)
                 {
-                    Debug.Log("Misil mengenai pemain, tetapi shield aktif!");
-                    return; // Tidak memberikan stun jika shield aktif
+                    Shield kartShield = other.GetComponent<Shield>();
+                    if (kartShield != null && kartShield.IsShieldActive)
+                    {
+                        Debug.Log("Misil mengenai pemain, tetapi shield aktif!");
+                        Explode();
+                        return; // Tidak memberikan stun jika shield aktif
+                    }
+                    Debug.Log("pp");
                 }
+                
 
-                if (playerKart != null)
+                if (IsServer) // Pastikan stun hanya dilakukan oleh server
                 {
-                    playerKart.Stun(stunDuration, "Missile"); // Stun dengan sumber "Missile"
-                }
+                    CarHandler playerKart = other.GetComponent<CarHandler>();
+                    if (playerKart != null)
+                    {
+                        playerKart.Stun(stunDuration, "Missile");
+                        ApplyStunClientRpc(other.GetComponent<NetworkObject>());
+                    }
 
-                Explode();
+                    Explode();
+                }
+                else
+                {
+                    // Jika client mendeteksi tabrakan, kirim permintaan ke server
+                    RequestStunServerRpc(other.GetComponent<NetworkObject>());
+                }
             }
-            
         }
     }
+
+    // Client meminta server untuk memberikan stun
+    [ServerRpc]
+    void RequestStunServerRpc(NetworkObjectReference target)
+    {
+        if (target.TryGet(out NetworkObject targetObject))
+        {
+            CarHandler playerKart = targetObject.GetComponent<CarHandler>();
+            if (playerKart != null)
+            {
+                playerKart.Stun(stunDuration, "Missile");
+                ApplyStunClientRpc(target);
+            }
+        }
+
+        Explode();
+    }
+
+    // Memberikan efek stun ke semua client (misalnya untuk efek visual)
+    [ClientRpc]
+    void ApplyStunClientRpc(NetworkObjectReference target)
+    {
+        if (target.TryGet(out NetworkObject targetObject))
+        {
+            CarHandler playerKart = targetObject.GetComponent<CarHandler>();
+            if (playerKart != null)
+            {
+                playerKart.Stun(stunDuration, "Missile");
+                // Jika ada efek visual khusus, tambahkan di sini
+                Debug.Log("Efek stun diterapkan di client.");
+            }
+        }
+    }
+
 
     private void Explode()
     {
@@ -79,14 +131,21 @@ public class Missile : MonoBehaviour
         // Hapus UI target saat misil meledak
         if (targetIndicator != null)
         {
-            Destroy(targetIndicator);
+            if (IsOwner)
+            {
+                RequestDestroyServerRpc();
+            }
         }
 
-        Destroy(gameObject);
+        if (IsOwner)
+        {
+            RequestDestroyServerRpc();
+        }
     }
 
     private void FindTarget()
     {
+        if (!IsOwner) return;
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         players.Remove(ownerTransform);
         Transform targetMisille = players[Random.Range(0, players.Count - 1)];
@@ -102,6 +161,18 @@ public class Missile : MonoBehaviour
             }
         }
         else
+        {
+            if (IsOwner)
+            {
+                RequestDestroyServerRpc();
+            }
+        }
+    }
+
+    [ServerRpc]
+    void RequestDestroyServerRpc()
+    {
+        if (IsServer)
         {
             Destroy(gameObject);
         }

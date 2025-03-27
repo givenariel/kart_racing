@@ -98,6 +98,7 @@ public class KartController : MonoBehaviour
 
         if (useItemInput > 0.1f)
         {
+            Debug.Log("useitem2");
             UseItem();
         }
     }

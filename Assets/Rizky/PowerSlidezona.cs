@@ -9,7 +9,7 @@ public class PowerSlideZone : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            CarController car = other.GetComponent<CarController>();
+            CarHandler car = other.GetComponent<CarHandler>();
 
             if (car != null)
             {

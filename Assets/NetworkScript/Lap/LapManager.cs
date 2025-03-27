@@ -1,148 +1,170 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using Unity.Netcode;
-using TMPro;
-using System.Collections.Generic;
-using System.Collections;
+using UnityEngine;
 
 public class LapManager : NetworkBehaviour
 {
-    private Dictionary<ulong, int> lastCheckpointPerPlayer = new Dictionary<ulong, int>();
-    private Dictionary<ulong, int> lapPerPlayer = new Dictionary<ulong, int>();
-    [SerializeField] private int totalCheckpoints;
-    private bool hasFinished = false;
+    public static LapManager Instance;
+    public int totalLaps = 3;
+    public List<Transform> checkpoints = new List<Transform>();
+    public Dictionary<ulong, PlayerLapData> playerLapData = new Dictionary<ulong, PlayerLapData>();
 
-    [SerializeField] private TextMeshProUGUI lapText; // Assign in Inspector
-    [SerializeField] private GameObject winUI; // Assign in Inspector
-    [SerializeField] private GameObject loseUI;
+    private NetworkList<ulong> playerPositions = new NetworkList<ulong>();
 
-    void Start()
+    public UIManager uiManager;
+
+    public NetworkVariable<NetworkObjectReference> uiManagerRef = new NetworkVariable<NetworkObjectReference>();
+
+    public NetworkVariable<int> pData = new NetworkVariable<int>();
+
+    private void Awake()
     {
-        StartCoroutine(InitializeCheckpoints());
-        totalCheckpoints = FindObjectsByType<Checkpoint>(FindObjectsSortMode.None).Length;
-        Debug.Log($"🔍 Found {totalCheckpoints} checkpoints in the scene.");
-        RaceManager.Instance.RegisterPlayer(OwnerClientId);
-        UpdateLapUI();
+        if (Instance == null) Instance = this;
+
+        if (playerPositions == null)
+        {
+            playerPositions = new NetworkList<ulong>();
+        }
     }
 
-    private IEnumerator InitializeCheckpoints()
-    {
-        yield return new WaitForSeconds(0.5f); // Delay to ensure all objects are loaded
-        totalCheckpoints = FindObjectsByType<Checkpoint>(FindObjectsSortMode.None).Length;
 
-        if (totalCheckpoints == 0)
+    private void Start()
+    {
+        if (playerPositions == null)
         {
-            Debug.LogError("🚨 No checkpoints found! Ensure checkpoints exist in the scene.");
-            yield break;
+            playerPositions = new NetworkList<ulong>();
         }
 
-        RaceManager.Instance.RegisterPlayer(OwnerClientId);
-        UpdateLapUI();
+        checkpoints.Clear();
+        foreach (Checkpoint checkpoint in FindObjectsByType<Checkpoint>(FindObjectsSortMode.None))
+        {
+            checkpoints.Add(checkpoint.transform);
+        }
+        checkpoints.Sort((a, b) => a.GetComponent<Checkpoint>().checkpointID.CompareTo(b.GetComponent<Checkpoint>().checkpointID));
+        
     }
 
-    private void Update()
+    public override void OnNetworkSpawn()
     {
-        UpdateLapUI();
-    }
 
-    public void OnCheckpointPassed(int checkpointID, ulong playerID)
-    {
-        if (hasFinished) return;
-
-        if (!lastCheckpointPerPlayer.ContainsKey(playerID))
+        if (IsServer)
         {
-            lastCheckpointPerPlayer[playerID] = -1;
-            lapPerPlayer[playerID] = 0;
-        }
-
-        int lastCheckpoint = lastCheckpointPerPlayer[playerID];
-        Debug.Log($"🚗 Player {playerID} passed checkpoint {checkpointID}. LastCheckpoint: {lastCheckpoint}");
-
-     
-        if (checkpointID == (lastCheckpoint + 1) % totalCheckpoints)
-        {
-            lastCheckpointPerPlayer[playerID] = checkpointID;
-        }
-
-       
-        if (checkpointID == 0 && lastCheckpoint == totalCheckpoints - 1)
-        {
-            lapPerPlayer[playerID]++;
-            lastCheckpointPerPlayer[playerID] = 0; 
-
-            Debug.Log($"🏁 Player {playerID} completed a lap! New lap count: {lapPerPlayer[playerID]}");
-
-            if (IsOwner)
+            uiManager.SetLapManagerRefServerRpc(new NetworkObjectReference(GetComponent<NetworkObject>()));
+            if (playerPositions == null)
             {
-                PlayerCompletedLapServerRpc(playerID, lapPerPlayer[playerID]);
+                playerPositions = new NetworkList<ulong>();
             }
 
-            UpdateLapUI();
+            // Register all connected clients
+            foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+            {
+                RegisterPlayerServerRpc(clientId);
+            }
+            
         }
+        NetworkObject netUi = uiManager.GetComponent<NetworkObject>();
+        uiManagerRef.Value = new NetworkObjectReference(netUi);
+    }
+
+    [ServerRpc]
+    public void RegisterPlayerServerRpc(ulong playerId)
+    {
+        if (!playerLapData.ContainsKey(playerId))
+        {
+            playerLapData[playerId] = new PlayerLapData();
+            if (IsServer)
+            {
+                if (!playerPositions.Contains(playerId))
+                {
+                    playerPositions.Add(playerId);
+                }
+            }
+            //pData.Value = playerLapData[playerId].position.Value;
+        }
+        
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void PlayerCompletedLapServerRpc(ulong playerID, int lap)
+    public void PlayerCrossedCheckpointServerRpc(ulong playerId, int checkpointIndex)
     {
-        if (hasFinished) return;
+        if (!playerLapData.ContainsKey(playerId)) return;
 
-        if (lap >= RaceManager.Instance.totalLapsToWin)
+        var playerData = playerLapData[playerId];
+
+        if (checkpointIndex == 0 && playerData.lastCheckpoint.Value == checkpoints.Count - 1)
         {
-            Debug.Log($"🎉 Player {playerID} won the race!");
-            hasFinished = true;
-
-            // Send winner info to all players
-            ShowWinLoseUIClientRpc(playerID);
+            playerData.lap.Value++;
+            pData.Value = playerData.lap.Value;
+            if (playerData.lap.Value > totalLaps)
+            {
+                Debug.Log($"Player {playerId} finished the race!");
+            }
         }
 
-        RaceManager.Instance.PlayerCompletedLapServerRpc(playerID, lap);
+        playerData.lastCheckpoint.Value = checkpointIndex;
+
+        // 🔹 Update posisi pemain
+        UpdatePlayerPositionsServerRpc();
+
+        // 🔹 Kirim update ke semua client melalui UIManager
+        
     }
 
     [ClientRpc]
-    private void ShowWinLoseUIClientRpc(ulong winnerID)
+    private void UpdatePlayerPositionsClientRpc(ulong playerId, int checkpointIndex, int lap, int position)
     {
-        Debug.Log($"📢 ShowWinLoseUIClientRpc CALLED! Winner: {winnerID}");
-        if (!IsOwner) return;
+        Debug.Log($"Client: Player {playerId} reached checkpoint {checkpointIndex}");
 
-        ulong localPlayerID = NetworkManager.Singleton.LocalClientId;
-        Debug.Log($"🖥️ Local Player {localPlayerID}: Checking Win/Lose UI...");
-
-        if (localPlayerID == winnerID)
+        if (uiManagerRef.Value.TryGet(out NetworkObject netObj) && netObj != null)
         {
-            if (winUI) winUI.SetActive(true);
-            Debug.Log("🏆 WIN UI ACTIVATED!");
+            uiManager = netObj.GetComponent<UIManager>();
+            uiManager.UpdateUIClientRpc(playerId, lap, position);
         }
-        else
-        {
-            Debug.Log("❌ Player LOST. Running ShowLoseUIWithDelay()");
-            StartCoroutine(ShowLoseUIWithDelay());
-        }
+        
     }
-
-    private IEnumerator ShowLoseUIWithDelay()
+    [ServerRpc]
+    private void UpdatePlayerPositionsServerRpc()
     {
-        Debug.Log("⌛ Coroutine STARTED: Waiting 1s...");
-        yield return new WaitForSeconds(1f);
+        Debug.Log("cobacekPos");
+        if (!IsServer) return;
 
-        if (loseUI)
+        var sortedPlayers = new List<ulong>(playerLapData.Keys);
+        sortedPlayers.Sort((a, b) =>
         {
-            loseUI.SetActive(true);
-            Debug.Log("💀 LOSE UI ACTIVATED!");
-        }
-        else
+            int lapCompare = playerLapData[b].lap.Value.CompareTo(playerLapData[a].lap.Value);
+            if (lapCompare != 0) return lapCompare;
+            return playerLapData[b].lastCheckpoint.Value.CompareTo(playerLapData[a].lastCheckpoint.Value);
+        });
+
+        playerPositions.Clear();
+        for (int i = 0; i < sortedPlayers.Count; i++)
         {
-            Debug.LogError("❌ loseUI is NULL!");
-        }
-    }
-    private void UpdateLapUI()
-    {
-        if (lapText != null)
-        {
-            if (!lapPerPlayer.ContainsKey(OwnerClientId))
+            ulong playerId = sortedPlayers[i];
+
+            int previousPosition = playerLapData[playerId].position.Value; // Get old position
+            int newPosition = i + 1; // New position based on sorted order
+
+            if (previousPosition != newPosition)
             {
-                lapPerPlayer[OwnerClientId] = 0; // Ensure player exists in dictionary
+                Debug.Log($"Player {playerId} is updating position from {previousPosition} to {newPosition}");
             }
-            lapText.text = $"Lap: {lapPerPlayer[OwnerClientId]}/{RaceManager.Instance.totalLapsToWin}";
+
+            playerPositions.Add(playerId);
+            playerLapData[playerId].position.Value = newPosition;
+            UpdatePlayerPositionsClientRpc(playerId, playerLapData[playerId].lastCheckpoint.Value, playerLapData[playerId].lap.Value, playerLapData[playerId].position.Value);
+            Debug.Log("playeridd" + playerId);
         }
+        Debug.Log("countsortPlayer" + sortedPlayers.Count);
     }
 
+
+    public IReadOnlyDictionary<ulong, PlayerLapData> PlayerLapData => playerLapData;
+}
+
+// ✅ PlayerLapData class (inside LapManager.cs)
+public class PlayerLapData
+{
+    public NetworkVariable<int> lap = new NetworkVariable<int>(1);
+    public NetworkVariable<int> lastCheckpoint = new NetworkVariable<int>(0);
+    public NetworkVariable<int> position = new NetworkVariable<int>(1);
 }

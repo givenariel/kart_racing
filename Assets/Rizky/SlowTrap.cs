@@ -15,7 +15,7 @@ public class ThrowableSlowTrap : MonoBehaviour
 
         if (other.CompareTag("Player") && other.transform != ownerTransform) // Jika kena pemain, beri efek slow
         {
-            CarController playerKart = other.GetComponent<CarController>();
+            CarHandler playerKart = other.GetComponent<CarHandler>();
             if (playerKart != null)
             {
                 hasSpawnedTrap = true;
@@ -99,7 +99,7 @@ public class ThrowableSlowTrap : MonoBehaviour
     {
         if (CompareTag("Trap") && other.CompareTag("Player") && other.transform != ownerTransform) // Jika pemain melewati jebakan
         {
-            CarController playerKart = other.GetComponent<CarController>();
+            CarHandler playerKart = other.GetComponent<CarHandler>();
             if (playerKart != null)
             {
                 Debug.Log("Pemain menginjak jebakan, memberikan efek slow!");

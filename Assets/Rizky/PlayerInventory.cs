@@ -2,8 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 using Unity.Android.Gradle.Manifest;
+using Unity.Netcode;
 
-public class PlayerInventory : MonoBehaviour
+public class PlayerInventory : NetworkBehaviour
 {
     [SerializeField] private List<GameObject> itemImages;
     public GameObject trapPrefab;
@@ -12,18 +13,48 @@ public class PlayerInventory : MonoBehaviour
     public Transform missileSpawn;
     private Dictionary<ItemType, GameObject> itemUIMap;
     [SerializeField] private ItemType currentItem = ItemType.None;
-    private CarController KartController;
+    private CarHandler KartController;
     private Shield shield;
     public Transform trapSpawn;
     public Transform throwSpawn;
     public float throwForce = 10f;
     public CarIdManager carIdManager;
+    public NetworkVariable<NetworkObjectReference> carIdManagerRef = new NetworkVariable<NetworkObjectReference>();
     public int dirMove;
+
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        if (IsClient)
+        {
+            // Coba ambil referensi jika sudah di-set
+            if (carIdManagerRef.Value.TryGet(out NetworkObject netObj) && netObj != null)
+            {
+                carIdManager = netObj.GetComponent<CarIdManager>();
+                Debug.Log($"[Client] carIdManager berhasil diperoleh: {carIdManager}");
+            }
+            else
+            {
+                Debug.LogWarning("[Client] carIdManagerRef belum valid atau belum di-set.");
+            }
+        }
+    }
+
+    // Server mengatur referensi
+    [ServerRpc (RequireOwnership = false)]
+    public void SetCarIdManagerRefServerRpc(NetworkObjectReference managerRef)
+    {
+        carIdManagerRef.Value = managerRef;
+    }
 
     void Start()
     {
-        KartController = GetComponent<CarController>();
+        KartController = GetComponent<CarHandler>();
         shield = GetComponent<Shield>();
+        
+        
 
         itemUIMap = new Dictionary<ItemType, GameObject>();
         ItemType[] itemTypes = (ItemType[])System.Enum.GetValues(typeof(ItemType));
@@ -55,6 +86,7 @@ public class PlayerInventory : MonoBehaviour
 
     public void UseItem()
     {
+        Debug.Log(currentItem.ToString());
         if (currentItem != ItemType.None)
         {
             if (currentItem == ItemType.Boost && KartController != null)
@@ -132,7 +164,7 @@ public class PlayerInventory : MonoBehaviour
                 //Debug.Log(throwDirection);
                 // Gunakan AddForce dengan mode Impulse untuk efek lemparan instan
                 slowTrapRb.AddForce(throwDirection.normalized * throwForce, ForceMode.Impulse);
-                throwDirection.y = Mathf.Tan(45 * Mathf.Deg2Rad); // Menyesuaikan sudut vertikal
+                throwDirection.y = Mathf.Tan(25 * Mathf.Deg2Rad); // Menyesuaikan sudut vertikal
                 throwDirection.Normalize();
 
                 Vector3 velocity = throwDirection * playerRb.linearVelocity.magnitude;
@@ -145,9 +177,9 @@ public class PlayerInventory : MonoBehaviour
     {
         
         rb.linearVelocity = initialVelocity;
-        Vector3 throwDirection = (transform.forward * 0.8f * inputP) + (transform.up * 0.1f) + (transform.right * Random.Range(0.05f, -0.05f));
+        Vector3 throwDirection = (transform.forward * 0.8f * inputP) + (transform.up * 0.01f) + (transform.right * Random.Range(0.05f, -0.05f));
         float elapsed = 0f;
-        rb.AddForce(throwDirection * 50 * playerRb.linearVelocity.magnitude, ForceMode.Acceleration);
+        rb.AddForce(throwDirection * 15 * (15 + (playerRb.linearVelocity.magnitude * 0.05f)), ForceMode.Acceleration);
         while (elapsed < 0.3f)
         {
             if (itemHandle.hasSpawnedTrap)
@@ -155,7 +187,7 @@ public class PlayerInventory : MonoBehaviour
                 yield break;
             }
             elapsed += Time.deltaTime;
-            rb.AddForce(throwDirection + playerRb.linearVelocity.magnitude * (transform.forward * inputP)* 0.5f, ForceMode.Acceleration);
+            rb.AddForce(throwDirection + (15 + (playerRb.linearVelocity.magnitude * 0.05f)) * (transform.forward * inputP)* 0.5f, ForceMode.Acceleration);
             yield return null;
         }
         elapsed = 0f;
@@ -166,7 +198,7 @@ public class PlayerInventory : MonoBehaviour
                 yield break;
             }
             elapsed += Time.deltaTime;
-            rb.AddForce(throwDirection + playerRb.linearVelocity.magnitude * -transform.up * 1f * elapsed, ForceMode.Acceleration);
+            rb.AddForce( (35 + (playerRb.linearVelocity.magnitude * 0.1f)) * -transform.up * 1f , ForceMode.Acceleration);
             yield return null;
         }
     }
@@ -181,11 +213,28 @@ public class PlayerInventory : MonoBehaviour
 
     private void FireMissile()
     {
+        if (IsOwner) // Pastikan hanya pemilik kendaraan yang bisa menembak
+        {
+            FireMissileServerRpc();
+        }
+    }
+
+    [ServerRpc]
+    private void FireMissileServerRpc()
+    {
         if (missilePrefab != null && missileSpawn != null)
         {
             GameObject missile = Instantiate(missilePrefab, missileSpawn.position, missileSpawn.rotation);
+            NetworkObject missileNetworkObject = missile.GetComponent<NetworkObject>();
+
+            if (missileNetworkObject != null)
+            {
+                missileNetworkObject.Spawn();
+            }
+
             missile.GetComponent<Missile>().ownerTransform = transform;
             missile.GetComponent<Missile>().players = new List<Transform>(carIdManager.players);
+
             Rigidbody missileRb = missile.GetComponent<Rigidbody>();
 
             if (missileRb != null)

@@ -1,19 +1,19 @@
+﻿using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Checkpoint : MonoBehaviour
+public class Checkpoint : NetworkBehaviour
 {
     public int checkpointID; // Unique ID for each checkpoint
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && other.TryGetComponent(out NetworkObject networkObject))
         {
-            LapManager lapManager = other.GetComponent<LapManager>();
-            if (lapManager != null)
-            {
-                ulong playerID = other.GetComponent<NetworkObject>().OwnerClientId; // Get player ID
-                lapManager.OnCheckpointPassed(checkpointID, playerID);
-            }
+            ulong playerId = networkObject.OwnerClientId;
+
+                LapManager.Instance.PlayerCrossedCheckpointServerRpc(playerId, checkpointID);
+                Debug.Log($"Client: Player {playerId} crossed checkpoint {checkpointID}");
+            
         }
     }
 }
