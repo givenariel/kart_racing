@@ -8,6 +8,7 @@ public class CharacterSpawner : NetworkBehaviour
     [SerializeField] private CharacterDatabase characterDatabase;
     [SerializeField] private List<Transform> spawnPoints = new List<Transform>(); // List of predefined spawn points
     [SerializeField] private  CarIdManager carIdManager;
+    [SerializeField] private NetworkObject routeHandlerNetObj;
 
     private List<Transform> availableSpawnPoints = new List<Transform>(); // Track unused spawn points
 
@@ -37,6 +38,9 @@ public class CharacterSpawner : NetworkBehaviour
                 Transform spawnPoint = availableSpawnPoints[0];
                 availableSpawnPoints.RemoveAt(0); // Remove the spawn point from the list
 
+                NetworkObject netObj = carIdManager.GetComponent<NetworkObject>();
+                AssignCarIdManagerClientRpc(netObj);
+
                 // Instantiate character at spawn point position with its rotation
                 var characterInstance = Instantiate(character.GameplayPrefab, spawnPoint.position, spawnPoint.rotation);
                 characterInstance.SpawnAsPlayerObject(client.Value.clientId);
@@ -46,10 +50,12 @@ public class CharacterSpawner : NetworkBehaviour
                  
                 // playerInventory.carIdManagerRef.Value = new NetworkObjectReference(carIdManager.GetComponent<NetworkObject>());
 
-                NetworkObject netObj = carIdManager.GetComponent<NetworkObject>();
-                AssignCarIdManagerClientRpc(netObj);
+                
                 characterInstance.GetComponent<PlayerInventory>().SetCarIdManagerRefServerRpc(new NetworkObjectReference(netObj));
+                characterInstance.GetComponent<PlayerInventory>().routeHandler = routeHandlerNetObj.GetComponent<RouteHandler>();
                 characterInstance.GetComponent<CarHandler>().carID = client.Value.clientId;
+
+                AssignRouteHandlerClientRpc(characterInstance);
 
                 Debug.Log($"[CharacterSpawner] Spawned {character.GameplayPrefab.name} at {spawnPoint.position} with rotation {spawnPoint.rotation.eulerAngles}");
             }
@@ -73,6 +79,16 @@ public class CharacterSpawner : NetworkBehaviour
         else
         {
             Debug.LogError("[Client] Referensi CarIdManager valid tapi NetworkObject tidak ditemukan!");
+        }
+    }
+    
+    [ClientRpc]
+    public void AssignRouteHandlerClientRpc(NetworkObjectReference playerInvenRef)
+    {
+        if (playerInvenRef.TryGet(out NetworkObject netObj))
+        {
+            PlayerInventory pInven = netObj.GetComponent<PlayerInventory>();
+            pInven.routeHandler = routeHandlerNetObj.GetComponent<RouteHandler>();
         }
     }
 }

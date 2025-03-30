@@ -6,7 +6,7 @@ public class RouteHandler : MonoBehaviour
     [SerializeField] private Transform[] routes; // Array dari tiap segmen jalur
     [SerializeField] private int resolution = 20; // Berapa banyak titik sampling per segmen
 
-    private List<Vector3> trackPoints = new List<Vector3>(); // Semua titik gabungan
+    [SerializeField] private List<Vector3> trackPoints = new List<Vector3>(); // Semua titik gabungan
     private List<float> trackDistances = new List<float>(); // Jarak kumulatif dari titik awal
     private List<float> checkpoints = new List<float>(); // Checkpoint jarak
 
@@ -70,11 +70,17 @@ public class RouteHandler : MonoBehaviour
                Mathf.Pow(t, 3) * p3;
     }
 
-    public (float progress, int lap, Vector3 closestPoint, bool[] checkpointStatus) GetTrackProgress(Vector3 carPosition, float currentLap, bool[] checkpointsPassed)
+    public List<Vector3> GetTrackPoints()
+    {
+        return new List<Vector3>(trackPoints);
+    }
+
+    public (float progress, int lap, Vector3 closestPoint, bool[] checkpointStatus, int index) GetTrackProgress(Vector3 carPosition, float currentLap, bool[] checkpointsPassed)
     {
         float minDistance = Mathf.Infinity;
         float closestProgress = 0f;
         Vector3 closestPoint = Vector3.zero;
+        int indexClosest = 0;
 
         for (int i = 0; i < trackPoints.Count; i++)
         {
@@ -84,6 +90,7 @@ public class RouteHandler : MonoBehaviour
                 minDistance = distance;
                 closestProgress = trackDistances[i];
                 closestPoint = trackPoints[i];
+                indexClosest = i;
             }
         }
 
@@ -99,7 +106,7 @@ public class RouteHandler : MonoBehaviour
             }
         }
 
-        return (normalizedProgress, lap, closestPoint, checkpointsPassed);
+        return (normalizedProgress, lap, closestPoint, checkpointsPassed, indexClosest);
     }
 
     public bool IsLapValid(bool[] checkpointsPassed)

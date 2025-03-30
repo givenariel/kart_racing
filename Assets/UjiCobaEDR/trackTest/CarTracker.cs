@@ -14,7 +14,7 @@ public class CarTracker : MonoBehaviour
 
     private void Update()
     {
-        var (progress, newLap, closestPoint, updatedCheckpoints) = track.GetTrackProgress(transform.position, lap, checkpointsPassed);
+        var (progress, newLap, closestPoint, updatedCheckpoints, iClosest) = track.GetTrackProgress(transform.position, lap, checkpointsPassed);
         checkpointsPassed = updatedCheckpoints;
 
         Debug.Log($"Progres: {progress} / {track.totalTrackLength}, Lap: {lap}");

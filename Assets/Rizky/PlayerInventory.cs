@@ -19,14 +19,16 @@ public class PlayerInventory : NetworkBehaviour
     public Transform throwSpawn;
     public float throwForce = 10f;
     public CarIdManager carIdManager;
+    public RouteHandler routeHandler;
     public NetworkVariable<NetworkObjectReference> carIdManagerRef = new NetworkVariable<NetworkObjectReference>();
+    public NetworkVariable<NetworkObjectReference> routeHandlerRef  = new NetworkVariable<NetworkObjectReference>();
     public int dirMove;
 
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-
+        
         if (IsClient)
         {
             // Coba ambil referensi jika sudah di-set
@@ -39,6 +41,17 @@ public class PlayerInventory : NetworkBehaviour
             {
                 Debug.LogWarning("[Client] carIdManagerRef belum valid atau belum di-set.");
             }
+
+            if (routeHandlerRef.Value.TryGet(out NetworkObject rhNetObj) && rhNetObj != null)
+            {
+                routeHandler = rhNetObj.GetComponent<RouteHandler>();
+                Debug.Log($"[Client] RouteHandler berhasil diperoleh: {carIdManager}");
+            }
+            else
+            {
+                Debug.LogWarning("[Client] RouteHandler Ref belum valid atau belum di-set.");
+            }
+
         }
     }
 
@@ -49,10 +62,19 @@ public class PlayerInventory : NetworkBehaviour
         carIdManagerRef.Value = managerRef;
     }
 
+    // Server mengatur referensi
+    [ClientRpc]
+    public void SetRouteHandlerRefClientRpc(NetworkObjectReference rHandlerRef)
+    {
+        routeHandlerRef.Value = rHandlerRef;
+    }
+
     void Start()
     {
         KartController = GetComponent<CarHandler>();
         shield = GetComponent<Shield>();
+
+            
         
         
 
@@ -232,8 +254,11 @@ public class PlayerInventory : NetworkBehaviour
                 missileNetworkObject.Spawn();
             }
 
-            missile.GetComponent<Missile>().ownerTransform = transform;
-            missile.GetComponent<Missile>().players = new List<Transform>(carIdManager.players);
+
+            Missile misil = missile.GetComponent<Missile>();
+            misil.ownerTransform = transform;
+            misil.players = new List<Transform>(carIdManager.players);
+            misil.routeHandler = routeHandler;
 
             Rigidbody missileRb = missile.GetComponent<Rigidbody>();
 
