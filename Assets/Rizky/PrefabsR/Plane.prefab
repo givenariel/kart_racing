@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8521031333420414874}
   - component: {fileID: 2660829228080848237}
   - component: {fileID: 7202482381638477238}
+  - component: {fileID: -4743280293150705462}
   - component: {fileID: 2569200777417483652}
   m_Layer: 0
   m_Name: Plane
@@ -109,6 +110,31 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10, y: 2.220446e-16, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-4743280293150705462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5077729897554343111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2681423389
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &2569200777417483652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121,6 +147,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 162dcc5975b28f249a8ce255c853d22b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   slowDuration: 3
   slowMultiplier: 0.5
   slowTrapPrefab: {fileID: 5077729897554343111}
+  hasSpawnedTrap: 0
+  ownerTransform: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8

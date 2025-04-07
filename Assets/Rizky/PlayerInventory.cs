@@ -19,16 +19,14 @@ public class PlayerInventory : NetworkBehaviour
     public Transform throwSpawn;
     public float throwForce = 10f;
     public CarIdManager carIdManager;
-    public RouteHandler routeHandler;
     public NetworkVariable<NetworkObjectReference> carIdManagerRef = new NetworkVariable<NetworkObjectReference>();
-    public NetworkVariable<NetworkObjectReference> routeHandlerRef  = new NetworkVariable<NetworkObjectReference>();
     public int dirMove;
 
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        
+
         if (IsClient)
         {
             // Coba ambil referensi jika sudah di-set
@@ -41,17 +39,6 @@ public class PlayerInventory : NetworkBehaviour
             {
                 Debug.LogWarning("[Client] carIdManagerRef belum valid atau belum di-set.");
             }
-
-            if (routeHandlerRef.Value.TryGet(out NetworkObject rhNetObj) && rhNetObj != null)
-            {
-                routeHandler = rhNetObj.GetComponent<RouteHandler>();
-                Debug.Log($"[Client] RouteHandler berhasil diperoleh: {carIdManager}");
-            }
-            else
-            {
-                Debug.LogWarning("[Client] RouteHandler Ref belum valid atau belum di-set.");
-            }
-
         }
     }
 
@@ -62,19 +49,10 @@ public class PlayerInventory : NetworkBehaviour
         carIdManagerRef.Value = managerRef;
     }
 
-    // Server mengatur referensi
-    [ClientRpc]
-    public void SetRouteHandlerRefClientRpc(NetworkObjectReference rHandlerRef)
-    {
-        routeHandlerRef.Value = rHandlerRef;
-    }
-
     void Start()
     {
         KartController = GetComponent<CarHandler>();
         shield = GetComponent<Shield>();
-
-            
         
         
 
@@ -152,21 +130,66 @@ public class PlayerInventory : NetworkBehaviour
 
     private void PlaceTrap()
     {
+        if (IsOwner)
+        {
+            PlaceTrapServerRpc();
+        }
+    }
+
+    [ServerRpc]
+    private void PlaceTrapServerRpc(ServerRpcParams rpcParams = default)
+    {
+        Debug.Log("[Server] PlaceTrapServerRpc called!");
+
         if (trapPrefab != null && trapSpawn != null)
         {
             GameObject trap = Instantiate(trapPrefab, trapSpawn.position, trapSpawn.rotation);
-            trap.GetComponent<Trap>().ownerTransform = transform;
-            trap.transform.SetParent(null);
+            NetworkObject trapNetworkObject = trap.GetComponent<NetworkObject>();
+
+            if (trapNetworkObject != null)
+            {
+                trapNetworkObject.Spawn();
+                Trap trapScript = trap.GetComponent<Trap>();
+                if (trapScript != null)
+                    trapScript.ownerTransform = transform;
+
+                trap.name = $"Trap_{OwnerClientId}";
+            }
+            else
+            {
+                Debug.LogError("Trap prefab is missing NetworkObject!");
+            }
+        }
+        else
+        {
+            Debug.LogError("trapPrefab or trapSpawn is null!");
         }
     }
 
     private void ThrowSlowTrap()
     {
+        if (IsOwner)
+        {
+            ThrowSlowTrapServerRpc(dirMove);
+        }
+    }
+
+
+    [ServerRpc]
+    private void ThrowSlowTrapServerRpc(int directionInput)
+    {
         if (slowTrapPrefab != null && throwSpawn != null)
         {
             GameObject slowTrap = Instantiate(slowTrapPrefab, throwSpawn.position, throwSpawn.rotation);
+            NetworkObject trapNetworkObject = slowTrap.GetComponent<NetworkObject>();
+            if (trapNetworkObject != null)
+            {
+                trapNetworkObject.Spawn();
+            }
+
             ThrowableSlowTrap throwItemHandle = slowTrap.GetComponent<ThrowableSlowTrap>();
             throwItemHandle.ownerTransform = transform;
+
             Rigidbody slowTrapRb = slowTrap.GetComponent<Rigidbody>();
 
             if (slowTrapRb != null)
@@ -174,26 +197,18 @@ public class PlayerInventory : NetworkBehaviour
                 slowTrapRb.useGravity = true;
                 slowTrapRb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
-                // Arah lemparan dengan parabola
-                Vector3 throwDirection = transform.forward *  dirMove + (transform.right * Random.Range(0.1f,-0.1f));
-
-                // Menambahkan momentum pemain agar lemparan tidak tertinggal di belakang
-                Rigidbody playerRb = GetComponent<Rigidbody>();
-                if (playerRb != null)
-                {
-                    //throwDirection += playerRb.linearVelocity * 10f; // Bisa disesuaikan agar efeknya lebih natural
-                }
-                //Debug.Log(throwDirection);
-                // Gunakan AddForce dengan mode Impulse untuk efek lemparan instan
-                slowTrapRb.AddForce(throwDirection.normalized * throwForce, ForceMode.Impulse);
-                throwDirection.y = Mathf.Tan(25 * Mathf.Deg2Rad); // Menyesuaikan sudut vertikal
+                Vector3 throwDirection = (transform.forward * directionInput) + (transform.right * Random.Range(0.1f, -0.1f));
+                throwDirection.y = Mathf.Tan(25 * Mathf.Deg2Rad);
                 throwDirection.Normalize();
 
+                Rigidbody playerRb = GetComponent<Rigidbody>();
                 Vector3 velocity = throwDirection * playerRb.linearVelocity.magnitude;
-                StartCoroutine(ParabolicMotion(velocity, slowTrapRb, playerRb, throwItemHandle, dirMove));
+
+                StartCoroutine(ParabolicMotion(velocity, slowTrapRb, playerRb, throwItemHandle, directionInput));
             }
         }
     }
+
 
     private IEnumerator ParabolicMotion(Vector3 initialVelocity, Rigidbody rb, Rigidbody playerRb, ThrowableSlowTrap  itemHandle, int inputP = 1)
     {
@@ -254,11 +269,8 @@ public class PlayerInventory : NetworkBehaviour
                 missileNetworkObject.Spawn();
             }
 
-
-            Missile misil = missile.GetComponent<Missile>();
-            misil.ownerTransform = transform;
-            misil.players = new List<Transform>(carIdManager.players);
-            misil.routeHandler = routeHandler;
+            missile.GetComponent<Missile>().ownerTransform = transform;
+            missile.GetComponent<Missile>().players = new List<Transform>(carIdManager.players);
 
             Rigidbody missileRb = missile.GetComponent<Rigidbody>();
 

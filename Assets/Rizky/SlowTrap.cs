@@ -1,6 +1,7 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class ThrowableSlowTrap : MonoBehaviour
+public class ThrowableSlowTrap : NetworkBehaviour
 {
     public float slowDuration = 3f; // Durasi efek slow
     public float slowMultiplier = 0.5f; // Seberapa lambat pemain jadi
@@ -11,93 +12,101 @@ public class ThrowableSlowTrap : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Trigger dengan: " + other.name); // Debug untuk cek trigger
+        if (!IsServer || hasSpawnedTrap) return;
 
-        if (other.CompareTag("Player") && other.transform != ownerTransform) // Jika kena pemain, beri efek slow
+        Debug.Log("Trigger dengan: " + other.name);
+
+        if (other.CompareTag("Player") && other.transform != ownerTransform)
         {
-            CarHandler playerKart = other.GetComponent<CarHandler>();
-            if (playerKart != null)
+            var targetNetObj = other.GetComponent<NetworkObject>();
+            if (targetNetObj != null)
             {
                 hasSpawnedTrap = true;
                 Debug.Log("Mengenai player, memberikan efek slow!");
-                playerKart.ApplySlowEffect(slowMultiplier, slowDuration);
-                Destroy(gameObject); // Hancurkan bola setelah mengenai player
+                ApplySlowEffectServerRpc(targetNetObj.NetworkObjectId);
             }
         }
-        else if (other.CompareTag("Ground") && !hasSpawnedTrap) // Jika kena tanah, ubah jadi jebakan
+        else if (other.CompareTag("Ground"))
         {
             hasSpawnedTrap = true;
             Debug.Log("Mengenai ground, mengubah menjadi jebakan!");
 
-            if (slowTrapPrefab == null)
-            {
-                Debug.LogError("slowTrapPrefab belum diassign di Inspector!");
-                return;
-            }
-
-            ThrowableSlowTrap trapScript = null;
-
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, -transform.up, out hit, 10f, groundLayer))
+            Vector3 contactPoint = transform.position;
+            Quaternion targetRotation = Quaternion.identity;
+
+            if (Physics.Raycast(transform.position, -transform.up, out hit, 10f, groundLayer) ||
+                Physics.Raycast(transform.position, transform.up, out hit, 10f, groundLayer))
             {
-                // Posisi titik singgung
-                Vector3 contactPoint = hit.point;
-
-                // Rotasi sejajar permukaan ground
-                Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-
-                // Opsional: Inisiasi objek baru
-                GameObject trap = Instantiate(slowTrapPrefab, contactPoint, targetRotation);
-                trapScript = trap.GetComponent<ThrowableSlowTrap>();
-                trapScript.ownerTransform = ownerTransform;
-            }
-            else if (Physics.Raycast(transform.position, transform.up, out hit, 10f, groundLayer))
-            {
-                // Posisi titik singgung
-                Vector3 contactPoint = hit.point;
-
-                // Rotasi sejajar permukaan ground
-                Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-
-                // Opsional: Inisiasi objek baru
-                GameObject trap = Instantiate(slowTrapPrefab, contactPoint, targetRotation);
-                trapScript = trap.GetComponent<ThrowableSlowTrap>();
-                trapScript.ownerTransform = ownerTransform;
-            }
-            else
-            {
-                GameObject trap = Instantiate(slowTrapPrefab, transform.position, Quaternion.identity);
-                trapScript = trap.GetComponent<ThrowableSlowTrap>();
-                trapScript.ownerTransform = ownerTransform;
+                contactPoint = hit.point;
+                targetRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
             }
 
-            
+            SpawnGroundTrapServerRpc(contactPoint, targetRotation);
+        }
+    }
 
+    [ServerRpc]
+    private void ApplySlowEffectServerRpc(ulong targetId)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var targetNetObj))
+        {
+            CarHandler playerKart = targetNetObj.GetComponent<CarHandler>();
+            if (playerKart != null)
+            {
+                playerKart.ApplySlowEffect(slowMultiplier, slowDuration);
+                Debug.Log("Efek slow diterapkan ke pemain!");
+            }
+        }
+
+        if (NetworkObject.IsSpawned)
+            NetworkObject.Despawn();
+    }
+
+    [ServerRpc]
+    private void SpawnGroundTrapServerRpc(Vector3 position, Quaternion rotation)
+    {
+        if (slowTrapPrefab == null)
+        {
+            Debug.LogError("slowTrapPrefab belum diassign di Inspector!");
+            return;
+        }
+
+        GameObject trap = Instantiate(slowTrapPrefab, position, rotation);
+        NetworkObject trapNetObj = trap.GetComponent<NetworkObject>();
+        if (trapNetObj != null)
+        {
+            trapNetObj.Spawn();
+            ThrowableSlowTrap trapScript = trap.GetComponent<ThrowableSlowTrap>();
             if (trapScript != null)
             {
+                trapScript.ownerTransform = ownerTransform;
                 trapScript.ActivateTrap();
-                Debug.Log("Jebakan berhasil dibuat!");
+                Debug.Log("Jebakan berhasil dibuat dan dishare ke semua client.");
             }
-            else
-            {
-                Debug.LogError("Komponen ThrowableSlowTrap tidak ditemukan pada prefab jebakan!");
-            }
-
-            Destroy(gameObject); // Hancurkan bola setelah berubah jadi jebakan
         }
+        else
+        {
+            Debug.LogError("Prefab jebakan tidak memiliki NetworkObject!");
+        }
+
+        if (NetworkObject.IsSpawned)
+            NetworkObject.Despawn();
     }
 
     public void ActivateTrap()
     {
         Debug.Log("Jebakan aktif!");
-        gameObject.tag = "Trap"; // Ubah tag agar tidak dianggap throwable lagi
+        gameObject.tag = "Trap";
         Collider col = GetComponent<Collider>();
-        if (col != null) col.isTrigger = true; // Jadikan jebakan trigger
+        if (col != null) col.isTrigger = true;
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if (CompareTag("Trap") && other.CompareTag("Player") && other.transform != ownerTransform) // Jika pemain melewati jebakan
+        if (!IsServer) return;
+
+        if (CompareTag("Trap") && other.CompareTag("Player") && other.transform != ownerTransform)
         {
             CarHandler playerKart = other.GetComponent<CarHandler>();
             if (playerKart != null)

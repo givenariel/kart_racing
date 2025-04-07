@@ -6,7 +6,7 @@ public class Shield : MonoBehaviour
     public float shieldDuration = 5f;
     public GameObject shieldVFX;
     public bool isShieldActive = false;
-
+    
     public bool IsShieldActive => isShieldActive; // Properti lebih ringkas
 
     public void ActivateShield()

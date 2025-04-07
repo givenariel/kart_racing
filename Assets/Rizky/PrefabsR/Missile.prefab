@@ -152,20 +152,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  speed: 40
+  speed: 30
   rotateSpeed: 500
   stunDuration: 20
-  detectionRadius: 10
   explosionEffect: {fileID: 0}
   targetIndicatorPrefab: {fileID: 0}
-  routeHandler: {fileID: 0}
   ownerTransform: {fileID: 0}
   players: []
-  checkpointsPassed: 
-  sideOffset: 10
-  verticalOffset: 2
-  waveFrequency: 4
-  noiseScale: 0.5
 --- !u!54 &-5451488390485752343
 Rigidbody:
   m_ObjectHideFlags: 0
