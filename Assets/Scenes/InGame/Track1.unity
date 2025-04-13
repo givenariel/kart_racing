@@ -2632,9 +2632,13 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: ecb31730b49928e4188190887d4907ea, type: 2}
     - target: {fileID: 6692288298539877758, guid: ac3e91b25ca3c0f4db6273da6a7e6fc4, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: c3e0a8de236988347b7f0464f06ac72f, type: 2}
+    - target: {fileID: 6692288298539877758, guid: ac3e91b25ca3c0f4db6273da6a7e6fc4, type: 3}
       propertyPath: m_TerrainData
       value: 
-      objectReference: {fileID: 15600000, guid: 1300f7e06c4dc794eb0ce287b9caa3f8, type: 2}
+      objectReference: {fileID: 15600000, guid: e327fb3a030d1b142a497205ae370e5a, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

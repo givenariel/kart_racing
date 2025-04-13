@@ -484,15 +484,19 @@ PrefabInstance:
     - target: {fileID: 7246872315329101996, guid: cc89061a7be017c488400dc91482db8e, type: 3}
       propertyPath: m_TerrainData
       value: 
-      objectReference: {fileID: 15600000, guid: 1300f7e06c4dc794eb0ce287b9caa3f8, type: 2}
+      objectReference: {fileID: 15600000, guid: e327fb3a030d1b142a497205ae370e5a, type: 2}
     - target: {fileID: 7246872315329101996, guid: cc89061a7be017c488400dc91482db8e, type: 3}
       propertyPath: m_MaterialTemplate
       value: 
       objectReference: {fileID: 2100000, guid: 2c0fe0288a917b6419544dcf9edaf329, type: 2}
     - target: {fileID: 8659345142692116835, guid: cc89061a7be017c488400dc91482db8e, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: c3e0a8de236988347b7f0464f06ac72f, type: 2}
+    - target: {fileID: 8659345142692116835, guid: cc89061a7be017c488400dc91482db8e, type: 3}
       propertyPath: m_TerrainData
       value: 
-      objectReference: {fileID: 15600000, guid: 1300f7e06c4dc794eb0ce287b9caa3f8, type: 2}
+      objectReference: {fileID: 15600000, guid: e327fb3a030d1b142a497205ae370e5a, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -526,7 +530,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5961480309f84e40a3377219a44a10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  newTerrainData: {fileID: 15600000, guid: 1300f7e06c4dc794eb0ce287b9caa3f8, type: 2}
+  newTerrainData: {fileID: 15600000, guid: e327fb3a030d1b142a497205ae370e5a, type: 2}
 --- !u!114 &8334155639244024585
 MonoBehaviour:
   m_ObjectHideFlags: 0
